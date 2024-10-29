@@ -26,7 +26,6 @@ export default async function handler(req, res) {
   const MAX_EXECUTION_TIME = 5000; // 5 seconds
 
   try {
-    // Write code to a file with correct naming for Java
     fs.writeFileSync(codeFileName, code);
 
     // Compile step for compiled languages
