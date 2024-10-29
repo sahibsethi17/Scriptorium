@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   const { compile, run, fileExt, fileName } = commands[language];
   const codeFileName = fileName || `temp_code.${fileExt}`;
-  const MAX_EXECUTION_TIME = 5000; // 5 seconds
+  const MAX_EXECUTION_TIME = 5000; 
 
   try {
     fs.writeFileSync(codeFileName, code);
