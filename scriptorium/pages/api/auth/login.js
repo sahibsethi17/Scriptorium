@@ -35,7 +35,8 @@ export default async function handler(req, res) {
         maxAge: 60 * 60 * 24 * 7,
       });
       console.log("check4.5")
-      res.setHeader('Set-Cookie', refreshTokenCookie);
+      res.setHeader('Set-Cookie', refreshTokenCookie); // Save refresh token in 
+      res.setHeader("Authorization", "Bearer " + accessToken);
       console.log("check5")
 
 
