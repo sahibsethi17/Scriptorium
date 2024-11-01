@@ -15,7 +15,7 @@ export default function Signup() {
     });
 
     if (res.ok) {
-      router.push('/dashboard');
+      router.push('/login');
     }
   };
 
