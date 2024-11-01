@@ -1,12 +1,25 @@
+// pages/api/execute.js
 import { spawn } from 'child_process';
 import fs from 'fs';
+import { prisma } from "@/utils/db";
+import { verifyAuth } from "@/utils/auth";
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { language, code, stdin } = req.body;
+  // Destructure request body with defaults
+  const { language, code, stdin = [], saveAsTemplate = false, title = "", explanation = "", tags = "" } = req.body;
+  const userId = verifyAuth(req);
+
+  // Validate that code is provided
+  if (!code || !language) {
+    return res.status(400).json({ error: 'Code and language are required' });
+  }
+
+  // Ensure `stdin` is an array, even if a single string is provided
+  const inputArray = typeof stdin === 'string' ? [stdin] : stdin;
 
   // Mapping languages to their respective execution commands
   const commands = {
@@ -23,7 +36,7 @@ export default async function handler(req, res) {
 
   const { compile, run, fileExt, fileName } = commands[language];
   const codeFileName = fileName || `temp_code.${fileExt}`;
-  const MAX_EXECUTION_TIME = 5000; 
+  const MAX_EXECUTION_TIME = 5000;
 
   try {
     fs.writeFileSync(codeFileName, code);
@@ -37,9 +50,9 @@ export default async function handler(req, res) {
           return reject(`Compilation error: ${data.toString()}`);
         });
 
-        compileProcess.on('close', (code) => {
-          if (code !== 0) {
-            return reject(`Compilation failed with code ${code}`);
+        compileProcess.on('close', (exitCode) => {
+          if (exitCode !== 0) {
+            return reject(`Compilation failed with code ${exitCode}`);
           }
           resolve();
         });
@@ -55,9 +68,9 @@ export default async function handler(req, res) {
       runProcess.kill('SIGTERM');
     }, MAX_EXECUTION_TIME);
 
-    // Handling standard input (stdin)
-    if (stdin) {
-      runProcess.stdin.write(stdin);
+    // Handling standard input (stdin), writing each entry in the inputArray as a new line
+    if (inputArray.length > 0) {
+      inputArray.forEach(input => runProcess.stdin.write(input + '\n'));
       runProcess.stdin.end();
     }
 
@@ -72,10 +85,10 @@ export default async function handler(req, res) {
       errors += data.toString();
     });
 
-    runProcess.on('close', (code) => {
+    runProcess.on('close', async (exitCode) => {
       clearTimeout(timeout);
 
-      if (code === null) {
+      if (exitCode === null) {
         return res.status(408).json({ error: 'Execution timed out' });
       }
 
@@ -83,7 +96,38 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: errors });
       }
 
-      return res.status(200).json({ output, exitCode: code });
+      // If `saveAsTemplate` is true, save the template with stdin as JSON string
+      if (saveAsTemplate) {
+        try {
+          const template = await prisma.template.create({
+            data: {
+              userId,
+              title,
+              explanation,
+              tags,
+              code,
+              stdin: inputArray.length > 0 ? JSON.stringify(inputArray) : null,  // Save stdin as JSON string if provided
+              language, 
+            },
+          });
+
+          return res.status(200).json({
+            output,
+            exitCode: exitCode,
+            templateId: template.id,
+            message: 'Code executed and template saved successfully'
+          });
+        } catch (templateError) {
+          console.error("Template saving error:", templateError);
+          return res.status(500).json({
+            error: 'Code executed, but template saving failed',
+            details: templateError.message
+          });
+        }
+      }
+
+      // If not saving as template, return execution result only
+      return res.status(200).json({ output, exitCode: exitCode });
     });
 
     runProcess.on('error', (err) => {

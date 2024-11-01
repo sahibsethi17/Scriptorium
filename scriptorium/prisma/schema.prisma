@@ -15,16 +15,17 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
   password    String
-  username    String   @unique
+  username    String    @unique
   firstName   String
   lastName    String
   phoneNumber BigInt
-  createdAt DateTime @default(now())
-  Blog Blog[] // All the blogs this user has created
-  Comment Comment[] // All the comments this user has created
+  createdAt   DateTime  @default(now())
+  Blog        Blog[]
+  Comment     Comment[]
+  Template    Template[] // All the templates this user has created
 }
 
 model Blog {
@@ -60,4 +61,20 @@ model Comment {
   // Connect comment back with its blog post
   blogId  Int
   blog    Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
+}
+
+
+model Template {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  explanation String
+  tags        String?
+  code        String
+  stdin       String?   
+  language    String?    
+  forkedFrom  Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

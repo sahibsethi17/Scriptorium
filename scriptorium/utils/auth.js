@@ -63,3 +63,15 @@ export function verifyToken(token) {
     }
 }
 
+export function verifyAuth(req) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return null;
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return decoded.userId;
+  } catch (error) {
+    return null;
+  }
+}
+
