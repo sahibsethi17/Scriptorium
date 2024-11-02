@@ -18,12 +18,12 @@ export default async function handler(req, res) {
     if (!title) return res.status(400).json({ error: "Title is invalid" });
     if (!description) return res.status(400).json({ error: "Description is invalid" });
 
-    // Prisma does not support arrays of primitive types, so tag lists must be a whole string with each tag separated by a comma
-    if (!tags) tags = ""; 
-    if (!templateIds) templateIds = "";
+    // If no tags
+    if (!tags) tags = "";
 
     // Get array of template IDs
-    templateIds = convertToArray(templateIds);
+    if (templateIds) templateIds = convertToArray(templateIds);
+    else templateIds = [];
 
     // Ensure no duplicate tags
     tags = removeDuplicateTags(tags);
@@ -44,6 +44,9 @@ export default async function handler(req, res) {
                     connect: templateIds.map((id) => ({ id })),
                 },
             },
+            include: {
+                templates: true,  
+            }
         });
         return res.status(201).json(blog);
     } catch(err) {
