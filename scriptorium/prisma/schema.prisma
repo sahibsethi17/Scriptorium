@@ -44,7 +44,7 @@ model Blog {
   createdAt   DateTime  @default(now())
   comments    Comment[] // All the comments on this blog post
   templates   Template[] // All the templates for this blog post
-  BlogReport BlogReport[]
+  BlogReport  BlogReport[]
 }
 
 // SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations

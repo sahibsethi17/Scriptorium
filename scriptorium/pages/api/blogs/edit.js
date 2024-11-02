@@ -5,7 +5,7 @@ import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
+    if (req.method !== 'PUT') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 

@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         }
         if (tags) {
             const tagsArray = tags.split(',');
-            for (tag of tagsArray) {
+            for (const tag of tagsArray) {
                 filter.AND.push({
                     tags: {
                         contains: tag
@@ -47,13 +47,12 @@ export default async function handler(req, res) {
                 })
             }
         }
-        let templateIds = [];
-        if (templateQuery) {
+        if (templateQuery || templateTags) {
 
             // SOURCE: https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams -- construct the URL with query parameters
             const url = new URL("http://localhost:3000/api/templates/search");
-            url.searchParams.append("templateQuery", templateQuery);
-            url.searchParams.append("templateTags", templateTags);
+            if (templateQuery) url.searchParams.append("query", templateQuery);
+            if (templateTags) url.searchParams.append("tags", templateTags);
 
             const response = await fetch(url, {
                     method: 'GET',
@@ -120,7 +119,10 @@ export default async function handler(req, res) {
         try {
             const blogs = await prisma.blog.findMany({
                 orderBy: orderBy,
-                where: filter
+                where: filter,
+                include: {
+                    templates: true,  
+                }
             });
             return res.status(200).json(blogs);
         } catch(err) {
