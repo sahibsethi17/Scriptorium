@@ -45,6 +45,7 @@ model Blog {
   comments    Comment[] // All the comments on this blog post
   templates   Template[] // All the templates for this blog post
   BlogReport  BlogReport[]
+  hidden      Boolean   @default(false) // Blog post won't be hidden by default
 }
 
 // SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations
@@ -67,6 +68,8 @@ model Comment {
   blogId  Int
   blog    Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
   CommentReport CommentReport[]
+
+  hidden      Boolean   @default(false) // Comment won't be hidden by default
 }
 
 model BlogReport {
