@@ -37,9 +37,6 @@ export default async function handler(req, res) {
             },
             data: {
                 upvotes: Number(upvotes) + diff
-            },
-            include: {
-                templates: true
             }
         })
         return res.status(200).json(comment);
