@@ -15,12 +15,66 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
   password    String
-  username    String   @unique
+  username    String    @unique
   firstName   String
   lastName    String
   phoneNumber BigInt
+  createdAt   DateTime  @default(now())
+  Blog        Blog[]
+  Comment     Comment[]
+  Template    Template[] // All the templates this user has created
+}
+
+model Blog {
+  id          Int       @id @default(autoincrement())
+  userId      Int  // The ID of the user that created this blog post
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  tags        String?
+  upvotes     Int       @default(0)
+  downvotes   Int       @default(0)
+  reports     Int       @default(0)
+  createdAt   DateTime  @default(now())
+  comments    Comment[] // All the comments on this blog post
+}
+
+// SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int // The ID of the user that created this comment
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
+  reports   Int      @default(0)
   createdAt DateTime @default(now())
+
+  // These fields were generated with ChatGPT -- PROMPT: In Prisma, how can I store replies to comments? I want this to be a recursive relation. 
+  parentId Int? // Foreign key to the parent comment (no parentId means the comment is not a reply to another comment)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+
+  // Connect comment back with its blog post
+  blogId  Int
+  blog    Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
+}
+
+
+model Template {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  explanation String
+  tags        String?
+  code        String
+  stdin       String?   
+  language    String?    
+  forkedFrom  Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import axios from 'axios';
 
 const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS);
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -41,6 +42,23 @@ export function generateRefreshToken(obj) {
     }
 }
 
+export function isTokenExpired(token) {
+    try {
+      const decodedToken = jwt.decode(token);
+      
+      if (!decodedToken || !decodedToken.exp) {
+        return true;
+      }
+  
+      // Convert expiration to milliseconds and compare with current time
+      const isExpired = decodedToken.exp * 1000 < Date.now();
+      return isExpired;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true;
+    }
+  }
+
 export function verifyToken(token) {
     if (!token?.startsWith("Bearer ")) {
         return null;
@@ -49,33 +67,43 @@ export function verifyToken(token) {
     token = token.split(" ")[1];
 
     try {
-        return jwt.verify(token, JWT_SECRET);
+        return jwt.verify(token, ACCESS_TOKEN_SECRET);
     } catch (err) {
         return null;
     }
 }
 
-export function verifyAuth(req) {
+export async function verifyAuth(req) {
     try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return null;
   
     try {
-      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      return decoded.userId;
+      const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
+      return user.userId;
     } catch (error) {
       return null;
     }
     } catch (error) { // If access token is expired
         if (error.name === 'TokenExpiredError') {
             const refreshToken = req.cookies.refreshToken;
-                if (!refreshToken) {
-                    return res.status(401).json({ error: 'This user is not logged in.' });
-                }
+            if (!refreshToken) {
+                return res.status(401).json({ error: 'This user is not logged in.' });
+            }
+            if (isTokenExpired(refreshToken)) {
+                try {
+                    const response = await axios.post('/api/logout');
+                    return response.data;
+                  } catch (error) {
+                    console.error('Logout failed:', error);
+                    throw error;
+                  }
+            } else {
             const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
             const payload = { userId: user.userId, username: user.username };
-            jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn:'15m' });
+            generateAccessToken(payload);
             return user.userId;
+            }
         } else {
             return null;
         }

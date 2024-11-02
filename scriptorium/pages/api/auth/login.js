@@ -34,6 +34,7 @@ export default async function handler(req, res) {
         maxAge: 60 * 60 * 24 * 7,
       });
       res.setHeader('Set-Cookie', refreshTokenCookie);
+      res.setHeader("Authorization", "Bearer " + accessToken);
 
 
       res.status(200).json({ message: 'Login successful', accessToken });

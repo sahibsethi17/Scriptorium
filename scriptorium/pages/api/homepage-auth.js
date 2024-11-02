@@ -1,8 +1,8 @@
-import { verifyToken } from "@/utils/auth";
+import { verifyAuth } from "@/utils/auth";
 
 export default function handler(req, res) {
-    const user = verifyToken(req.headers.authorization);
-    if (!user) {
+    const userId = verifyAuth(req);
+    if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
