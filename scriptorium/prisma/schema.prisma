@@ -26,6 +26,9 @@ model User {
   Blog        Blog[]
   Comment     Comment[]
   Template    Template[] // All the templates this user has created
+  role        String    @default("USER")
+  BlogReport BlogReport[]
+  CommentReport CommentReport[]
 }
 
 model Blog {
@@ -40,6 +43,8 @@ model Blog {
   reports     Int       @default(0)
   createdAt   DateTime  @default(now())
   comments    Comment[] // All the comments on this blog post
+  templates   Template[] // All the templates for this blog post
+  BlogReport BlogReport[]
 }
 
 // SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations
@@ -61,7 +66,38 @@ model Comment {
   // Connect comment back with its blog post
   blogId  Int
   blog    Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  CommentReport CommentReport[]
 }
+
+model BlogReport {
+  id          Int      @id @default(autoincrement())
+  userId      Int      // The ID of the user who created this report
+  blogId      Int      // The ID of the blog post being reported
+  explanation String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog        Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  @@unique([userId, blogId]) // SOURCE: https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-composite-ids-and-constraints -- Ensures a unique report for each user-blog combination
+}
+
+model CommentReport {
+  id          Int      @id @default(autoincrement())
+  userId      Int      // The ID of the user who created this report
+  commentId   Int      // The ID of the comment being reported
+  explanation String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment     Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  @@unique([userId, commentId]) // SOURCE: https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-composite-ids-and-constraints -- Ensures a unique report for each user-comment combination
+}
+
+// model Upvote {
+
+// }
+
+// model Downvote {
+
+// }
 
 
 model Template {
@@ -77,4 +113,5 @@ model Template {
   forkedFrom  Int?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  Blog        Blog[]
 }

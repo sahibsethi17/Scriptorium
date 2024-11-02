@@ -1,4 +1,6 @@
 // Getter endpoint for blogs
+import { verifyAuth } from '@/utils/auth';
+import { convertToArray } from '@/utils/blog-utils';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -16,10 +18,10 @@ export default async function handler(req, res) {
         }
 
     } else { // If at least one parameter is provided
-        const { id, title, description, tags, order } = req.query;
+        const { id, title, description, tags, order, templateQuery, templateTags } = req.query;
 
         // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- used for filtering and sorting
-        let filter = {};
+        let filter = { AND: [] };
         if (id) {
             filter.id = {
                 in: [Number(id)]
@@ -36,11 +38,53 @@ export default async function handler(req, res) {
             }
         }
         if (tags) {
-            filter.AND = tags.split(',').map(tag =>({
-                tags: {
-                    contains: tag
+            const tagsArray = tags.split(',');
+            for (tag of tagsArray) {
+                filter.AND.push({
+                    tags: {
+                        contains: tag
+                    }
+                })
+            }
+        }
+        let templateIds = [];
+        if (templateQuery) {
+
+            // SOURCE: https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams -- construct the URL with query parameters
+            const url = new URL("http://localhost:3000/api/templates/search");
+            url.searchParams.append("templateQuery", templateQuery);
+            url.searchParams.append("templateTags", templateTags);
+
+            const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json' 
+                    }
                 }
-            }))
+            );
+            if (!response.ok) {
+                console.log("ERROR");
+                return res.status(500).json({ error: "Internal server error" });
+            }
+            const json = await response.json();
+            const templates = json.templates;
+            console.log(templates);
+            let templateIds = []; 
+            for (const template of templates) {
+                templateIds.push(template.id);
+            }
+
+            // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- using the some keyword in Prisma
+            filter.AND.push({
+                templates: {
+                    some: {
+                        id: {
+                            in: templateIds
+                        }
+                    }
+                }
+            });
+            
         }
         
         // Finalize the order in which the blog posts are sorted
@@ -53,6 +97,22 @@ export default async function handler(req, res) {
                 case 'downvotes':
                     orderBy.downvotes = 'desc'
                     break;
+                case 'reports':
+                    // Verify that the user is an admin
+                    const userId = verifyAuth(req);
+                    if (!userId) {
+                        return res.status(401).json({ error: "Unauthorized action" });
+                    }
+                    const { role } = await prisma.user.findUnique({
+                        where: {
+                            id: Number(userId)
+                        }
+                    })
+                    if (role.toLowerCase() !== 'admin') {
+                        return res.status(401).json({ error: "Unauthorized action" });
+                    }
+                    orderBy.reports = 'desc'
+                    break;
             }
         }
 
@@ -64,6 +124,7 @@ export default async function handler(req, res) {
             });
             return res.status(200).json(blogs);
         } catch(err) {
+            console.log(err);
             return res.status(500).json({ error: "Internal server error" });
         }
     }

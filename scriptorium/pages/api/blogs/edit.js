@@ -1,15 +1,18 @@
 // Edit endpoint for blogs
-import { removeDuplicateTags } from '@/utils/blog-utils';
+import { removeDuplicateTags, convertToArray } from '@/utils/blog-utils';
 
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { verifyAuth } from '@/utils/auth';
+import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    let { id, title, description, tags } = req.body;
+    const userId = verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
+
+    let { id, title, description, tags, templateIds } = req.body;
 
     // Get the updated parameters
     let update = {};
@@ -21,12 +24,16 @@ export default async function handler(req, res) {
         tags = removeDuplicateTags(tags);
         update.tags = tags;
     }
+    if (templateIds) {
+        update.templateIds = templateIds;
+    }
 
     try {
-        // Delete entry from database
+        // Edit entry in database
         const blog = await prisma.blog.update({
             where: {
-                id: Number(id)
+                id: Number(id),
+                userId
             },
             data: update
         })

@@ -1,11 +1,14 @@
 // Upvote endpoint for blogs
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { verifyAuth } from '@/utils/auth';
+import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
+
+    const userId = verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // Diff is how much the upvote will change by (either 1 or -1)
     let { id, diff } = req.body;

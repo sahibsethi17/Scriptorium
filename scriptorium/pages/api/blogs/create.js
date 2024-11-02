@@ -1,6 +1,6 @@
 // Create endpoint for blogs
-import { verifyToken } from '@/utils/auth';
-import { removeDuplicateTags } from '@/utils/blog-utils';
+import { removeDuplicateTags, convertToArray } from '@/utils/blog-utils';
+import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
@@ -8,12 +8,11 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    let { title, description, tags } = req.body;
+    let { title, description, tags, templateIds } = req.body;
 
     // Get the currently logged in user (if exists)
-    const accessToken = verifyToken(req.headers.authorization);
-    if (!accessToken) return res.status(401).json({ error: 'Unauthorized action' });
-    const userId = accessToken.userId;
+    const userId = verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // If invalid parameters
     if (!title) return res.status(400).json({ error: "Title is invalid" });
@@ -21,6 +20,10 @@ export default async function handler(req, res) {
 
     // Prisma does not support arrays of primitive types, so tag lists must be a whole string with each tag separated by a comma
     if (!tags) tags = ""; 
+    if (!templateIds) templateIds = "";
+
+    // Get array of template IDs
+    templateIds = convertToArray(templateIds);
 
     // Ensure no duplicate tags
     tags = removeDuplicateTags(tags);
@@ -36,11 +39,15 @@ export default async function handler(req, res) {
                 },
                 title,
                 description,
-                tags
+                tags,
+                templates: {
+                    connect: templateIds.map((id) => ({ id })),
+                },
             },
         });
         return res.status(201).json(blog);
     } catch(err) {
-        res.status(500).json({ error: "Internal server error" });
+        console.log(err);
+        res.status(500).json({ error: "Internal server error", details: err.message });
     }   
 }

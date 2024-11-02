@@ -4,7 +4,7 @@ import { hashPassword } from "@/utils/auth";
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email, password, username, firstName, lastName, phoneNumber } = req.body;
+    const { email, password, username, firstName, lastName, phoneNumber, role } = req.body;
     
     if (!email || !password || !username || !firstName || !lastName || !phoneNumber) {
       return res.status(400).json({ error: "Please provide all the required fields." });
@@ -40,6 +40,7 @@ export default async function handler(req, res) {
           firstName,
           lastName,
           phoneNumber,
+          role
         },
       });
 

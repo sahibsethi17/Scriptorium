@@ -1,11 +1,14 @@
 // Create endpoint for comments
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { verifyAuth } from '@/utils/auth';
+import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
+
+    const userId = verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     let { blogId, parentId, content } = req.body;
 
@@ -18,6 +21,11 @@ export default async function handler(req, res) {
             blog: {
                 connect: { // SOURCE: Using the connect keyword in Prisma -- https://stackoverflow.com/questions/65950407/prisma-many-to-many-relations-create-and-connect
                     id: blogId
+                }
+            },
+            user: {
+                connect: {
+                    id: userId
                 }
             }
         }
@@ -44,6 +52,7 @@ export default async function handler(req, res) {
 
         return res.status(201).json(comment);
     } catch(err) {
+        console.log(err);
         res.status(500).json({ error: "Internal server error" });
     }   
 }

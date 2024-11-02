@@ -1,5 +1,5 @@
 // Create endpoint for blogs
-import { verifyToken } from '@/utils/auth';
+import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
@@ -8,9 +8,8 @@ export default async function handler(req, res) {
     }
 
     // Get the currently logged in user (if exists)
-    const accessToken = verifyToken(req.headers.authorization);
-    if (!accessToken) return res.status(401).json({ error: 'Unauthorized action' });
-    const userId = accessToken.userId;
+    const userId = verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // Get the blog ID
     let { id } = req.body;
