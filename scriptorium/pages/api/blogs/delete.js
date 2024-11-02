@@ -19,8 +19,11 @@ export default async function handler(req, res) {
         // Delete entry from database
         const blog = await prisma.blog.delete({
             where: {
-                id: Number(id),
+                id,
                 userId
+            },
+            include: {
+                templates: true
             }
         })
         return res.status(200).json(blog);
