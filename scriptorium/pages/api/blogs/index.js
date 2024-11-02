@@ -121,7 +121,8 @@ export default async function handler(req, res) {
                 orderBy: orderBy,
                 where: filter,
                 include: {
-                    templates: true,  
+                    templates: true,
+                    comments: true  
                 }
             });
             return res.status(200).json(blogs);
