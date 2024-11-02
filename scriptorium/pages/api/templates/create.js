@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   const { title, explanation, tags, code, stdin = [], language } = req.body;
-  const userId = verifyAuth(req);
+  const userId = await verifyAuth(req);
 
   if (!userId) {
     return res.status(401).json({ error: 'Unauthorized' });
