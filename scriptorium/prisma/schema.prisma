@@ -22,6 +22,7 @@ model User {
   firstName   String
   lastName    String
   phoneNumber BigInt
+  avatar      String?
   createdAt   DateTime  @default(now())
   Blog        Blog[]
   Comment     Comment[]
