@@ -66,10 +66,19 @@ export default async function handler(req, res) {
       }
 
       case 'DELETE': {
+        const user = await prisma.user.findUnique({
+          where: { id: parseInt(id, 10) },
+        });
+      
+        if (!user) {
+          return res.status(404).json({ error: "User not found." });
+        }
+      
+        // Proceed with deletion if the user exists
         await prisma.user.delete({
           where: { id: parseInt(id, 10) },
         });
-
+      
         return res.status(200).json({ message: "User deleted successfully" });
       }
 
