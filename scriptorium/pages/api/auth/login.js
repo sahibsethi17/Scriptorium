@@ -24,7 +24,6 @@ export default async function handler(req, res) {
       // Generate tokens
       const accessToken = generateAccessToken({ userId: user.id, username: user.username });
       const refreshToken = generateRefreshToken({ userId: user.id, username: user.username });
-      console.log("check4")
 
 
       const refreshTokenCookie = serialize('refreshToken', refreshToken, {
@@ -34,10 +33,8 @@ export default async function handler(req, res) {
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
       });
-      console.log("check4.5")
-      res.setHeader('Set-Cookie', refreshTokenCookie); // Save refresh token in 
+      res.setHeader('Set-Cookie', refreshTokenCookie);
       res.setHeader("Authorization", "Bearer " + accessToken);
-      console.log("check5")
 
 
       res.status(200).json({ message: 'Login successful', accessToken });
