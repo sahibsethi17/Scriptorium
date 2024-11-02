@@ -25,17 +25,24 @@ export default async function handler(req, res) {
         update.tags = tags;
     }
     if (templateIds) {
-        update.templateIds = templateIds;
+        templateIds = convertToArray(templateIds);
+        update.templates = {};
+        // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries -- connecting in Prisma
+        update.templates.connect = templateIds.map((templateId) => ({ id: templateId }));
     }
 
     try {
+        console.log(update);
         // Edit entry in database
         const blog = await prisma.blog.update({
             where: {
-                id: Number(id),
+                id,
                 userId
             },
-            data: update
+            data: update,
+            include: {
+                templates: true
+            }
         })
         return res.status(200).json(blog);
     } catch(err) {

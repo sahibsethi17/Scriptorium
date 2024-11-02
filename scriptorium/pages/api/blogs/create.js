@@ -20,13 +20,11 @@ export default async function handler(req, res) {
 
     // If no tags
     if (!tags) tags = "";
+    tags = removeDuplicateTags(tags);
 
     // Get array of template IDs
     if (templateIds) templateIds = convertToArray(templateIds);
     else templateIds = [];
-
-    // Ensure no duplicate tags
-    tags = removeDuplicateTags(tags);
 
     try {
         // Create new entry in database
