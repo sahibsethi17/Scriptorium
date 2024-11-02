@@ -37,6 +37,9 @@ export default async function handler(req, res) {
             },
             data: {
                 downvotes: Number(downvotes) + diff
+            },
+            include: {
+                templates: true
             }
         })
         return res.status(200).json(blog);
