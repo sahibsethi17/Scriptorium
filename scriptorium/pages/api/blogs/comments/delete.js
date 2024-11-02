@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         // Delete entry from database
         const comment = await prisma.comment.delete({
             where: {
-                id: Number(id),
+                id,
                 userId
             }
         })
