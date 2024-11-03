@@ -7,9 +7,7 @@ npm install
 npm install formidable
 npm install path
 
-npm install formidable
 
-npm install path
 # Run all migrations
 npx prisma migrate dev --name init
 
@@ -35,32 +33,35 @@ if ! command -v node &> /dev/null; then
     echo "Node.js is not installed. Please install Node.js to run JavaScript code."
 fi
 
+# GENERATED WITH CHATGPT: Create the admin user
+node -e "(async () => { 
+    const { PrismaClient } = require('@prisma/client');
+    const bcrypt = require('bcrypt');
+    const prisma = new PrismaClient();
+    try {
+        const hashedPassword = await bcrypt.hash('adminPassword', 10);
+        const user = await prisma.user.create({ 
+            data: {
+                email: 'admin@example.com',  
+                username: 'admin',     
+                password: hashedPassword,  
+                firstName: 'Admin',      
+                lastName: 'User',        
+                phoneNumber: BigInt('1234567890'),  
+                avatar: '@/scriptorium/public/uploads/avatars/man.png', 
+                role: 'ADMIN'             
+            },
+        });
+        console.log(user);
+    } catch (error) {
+        console.error('Error creating user:', error);
+    } finally {
+        await prisma.\$disconnect();
+    }
+})()"
 
-echo "Starting the server..."
-npm run dev & 
-SERVER_PID=$!
-
-
-echo "Waiting for server to start..."
-sleep 2
-
-echo "Creating admin user..."
-curl -X POST http://localhost:3000/api/users/signup \
--H "Content-Type: application/json" \
--d '{
-  "email": "admin@example.com",
-  "password": "adminPassword",
-  "username": "admin",
-  "role": "ADMIN",
-  "firstName": "Admin",
-  "lastName": "User",
-  "phoneNumber": 1234567890,
-  "avatar": "@/scriptorium/public/uploads/avatars/man.png"
-}'
 echo "Admin user created successfully."
 
-
-echo "Stopping the server..."
-kill $SERVER_PID
-
 echo "Setup complete."
+
+cd ..
