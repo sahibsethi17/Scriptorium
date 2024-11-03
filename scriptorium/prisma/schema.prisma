@@ -29,6 +29,10 @@ model User {
   role        String    @default("USER")
   BlogReport BlogReport[]
   CommentReport CommentReport[]
+
+  BlogVote BlogVote[]
+
+  CommentVote CommentVote[]
 }
 
 model Blog {
@@ -46,6 +50,10 @@ model Blog {
   templates   Template[] // All the templates for this blog post
   BlogReport  BlogReport[]
   hidden      Boolean   @default(false) // Blog post won't be hidden by default
+
+  BlogVote BlogVote[]
+
+  CommentVote CommentVote[]
 }
 
 // SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations
@@ -94,14 +102,29 @@ model CommentReport {
   @@unique([userId, commentId]) // SOURCE: https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-composite-ids-and-constraints -- Ensures a unique report for each user-comment combination
 }
 
-// model Upvote {
+// GENERATED WITH CHATGPT
+model BlogVote {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  blogId    Int
+  type      String
+  createdAt DateTime @default(now())
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog      Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  @@unique([userId, blogId]) // Ensures each user can only vote once per blog post
+}
 
-// }
-
-// model Downvote {
-
-// }
-
+// GENERATED WITH CHATGPT
+model CommentVote {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  commentId    Int
+  type      String
+  createdAt DateTime @default(now())
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blog      Blog  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  @@unique([userId, commentId]) // Ensures each user can only vote once per comment
+}
 
 model Template {
   id          Int       @id @default(autoincrement())

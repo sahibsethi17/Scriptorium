@@ -86,6 +86,31 @@ export default async function handler(req, res) {
             
         }
         
+        // Check if we have a logged in user
+        const userId = verifyAuth(req);
+        let isAdmin = false;
+        let currentUserId = null;
+
+        if (userId) {
+            // Retrieve the user role and ID if the user is logged in
+            const { role, id } = await prisma.user.findUnique({
+                where: { id: Number(userId) },
+                select: { role: true, id: true }
+            });
+            isAdmin = role.toLowerCase() === 'admin';
+            currentUserId = id;
+        }
+
+        // Apply hidden filter
+        if (!isAdmin) {
+            filter.AND.push({
+                OR: [
+                    { hidden: false },  // Show non-hidden blogs to all users
+                    userId ? { hidden: true, userId: currentUserId } : {}  // Show hidden blogs only if user owns it
+                ]
+            });
+        }
+        
         // Finalize the order in which the blog posts are sorted
         let orderBy = {};
         if (order) {

@@ -63,15 +63,41 @@ export function verifyToken(token) {
     }
 }
 
-export function verifyAuth(req) {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return null;
+export async function verifyAuth(req) {
+    try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return null;
+  
+    try {
+      const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
+      return user.userId;
+    } catch (error) {
+      return null;
+    }
+    } catch (error) { // If access token is expired
+        if (error.name === 'TokenExpiredError') {
+            const refreshToken = req.cookies.refreshToken;
+            if (!refreshToken) {
+                return res.status(401).json({ error: 'This user is not logged in.' });
+            }
+            if (isTokenExpired(refreshToken)) {
+                try {
+                    const response = await axios.post('/api/logout');
+                    return response.data;
+                  } catch (error) {
+                    console.error('Logout failed:', error);
+                    throw error;
+                  }
+            } else {
+            const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+            const payload = { userId: user.userId, username: user.username };
+            generateAccessToken(payload);
+            return user.userId;
+            }
+        } else {
+            return null;
+        }
 
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    return decoded.userId;
-  } catch (error) {
-    return null;
+    }
   }
-}
 
