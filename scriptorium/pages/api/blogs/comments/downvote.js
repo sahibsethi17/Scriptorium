@@ -1,4 +1,4 @@
-// Downvote endpoint for comments
+// downvote endpoint for comments
 import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
 
@@ -7,40 +7,93 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const userId = verifyAuth(req);
+    const userId = await verifyAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
-    // Diff is how much the downvote will change by (either 1 or -1)
-    let { id, diff } = req.body;
+    const { id, diff } = req.body;
+    if (!id || typeof diff !== 'number') {
+        return res.status(400).json({ error: "Invalid parameters" });
+    }
 
-    // If invalid parameters
-    if (!id) return res.status(400).json({ error: "Comment ID not provided" });
-    if (!diff) return res.status(400).json({ error: "Diff not provided" });
-
+    // GENERATED WITH CHATGPT
     try {
-        // Get current number of downvotes
-        const { downvotes } = await prisma.comment.findUnique({
+        // Check if a vote already exists for this user and comment
+        const existingVote = await prisma.commentVote.findUnique({
             where: {
-                id: Number(id)
-            },
-        })
-        if (typeof downvotes === 'null') {
-            return res.status(404).json({ error: "Comment not found" });
-        }
-        if (downvotes == 0 && diff == -1) {
-            return res.status(409).json({ error: "Downvotes cannot be decremented at 0" });
-        }
-        // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update -- used for updating database entries
-        const comment = await prisma.comment.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                downvotes: Number(downvotes) + diff
+                userId_commentId: { userId: Number(userId), commentId: Number(id) },
             }
-        })
-        return res.status(200).json(comment);
-    } catch(err) {
+        });
+
+        // If user is trying to downvote
+        if (diff === 1) {
+            if (existingVote) {
+                if (existingVote.type === "DOWNVOTE") {
+                    return res.status(409).json({ error: "You have already downvoted this comment." });
+                } else if (existingVote.type === "UPVOTE") {
+                    // Decrement upvotes by 1
+                    await prisma.comment.update({
+                        where: { id: Number(id) },
+                        data: {
+                            upvotes: { decrement: 1 },
+                        }
+                    });
+                    await prisma.commentVote.update({
+                        where: { id: existingVote.id },
+                        data: { type: "DOWNVOTE" }
+                    });
+                }
+                // Increment downvotes by 1
+                await prisma.comment.update({
+                    where: { id: Number(id) },
+                    data: {
+                        downvotes: { increment: 1 },
+                    }
+                });
+                await prisma.commentVote.update({
+                    where: { id: existingVote.id },
+                    data: { type: "DOWNVOTE" }
+                });
+            } else {
+                // Add a new DOWNVOTE
+                await prisma.comment.update({
+                    where: { id: Number(id) },
+                    data: { downvotes: { increment: 1 } }
+                });
+                await prisma.commentVote.create({
+                    data: {
+                        userId: Number(userId),
+                        commentId: Number(id),
+                        type: "DOWNVOTE"
+                    }
+                });
+            }
+        } else if (diff === -1) {
+            if (existingVote) {
+                if (existingVote.type === "DOWNVOTE") {
+                    await prisma.comment.update({
+                        where: { id: Number(id) },
+                        data: {
+                            downvotes: { decrement: 1 },
+                        }
+                    });
+                }
+                await prisma.commentVote.update({
+                    where: { id: existingVote.id },
+                    data: { type: "" }
+                });
+            } else {
+                return res.status(400).json({ error: "Cannot undownvote a post you haven't downvoted" })
+            }
+        }
+
+        const updatedComment = await prisma.comment.findUnique({
+            where: { id: Number(id) }
+        });
+
+        return res.status(200).json(updatedComment);
+
+    } catch (err) {
+        console.error("Error updating comment vote:", err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }

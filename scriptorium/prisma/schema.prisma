@@ -52,8 +52,6 @@ model Blog {
   hidden      Boolean   @default(false) // Blog post won't be hidden by default
 
   BlogVote BlogVote[]
-
-  CommentVote CommentVote[]
 }
 
 // SOURCE: https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/self-relations#relational-databases -- how to define self relations
@@ -76,8 +74,8 @@ model Comment {
   blogId  Int
   blog    Blog  @relation(fields: [blogId], references: [id], onDelete: Cascade)
   CommentReport CommentReport[]
-
   hidden      Boolean   @default(false) // Comment won't be hidden by default
+  CommentVote CommentVote[]
 }
 
 model BlogReport {
@@ -118,11 +116,11 @@ model BlogVote {
 model CommentVote {
   id        Int    @id @default(autoincrement())
   userId    Int
-  commentId    Int
+  commentId Int
   type      String
   createdAt DateTime @default(now())
   user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  blog      Blog  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   @@unique([userId, commentId]) // Ensures each user can only vote once per comment
 }
 
