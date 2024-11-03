@@ -4,6 +4,8 @@ cd scriptorium
 
 # Install all required packages via npm
 npm install
+npm install formidable
+npm install path
 
 # Run all migrations
 npx prisma migrate dev --name init
