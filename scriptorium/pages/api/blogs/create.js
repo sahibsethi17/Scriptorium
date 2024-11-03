@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     let { title, description, tags, templateIds } = req.body;
 
     // Get the currently logged in user (if exists)
-    const userId = verifyAuth(req);
+    const userId = await verifyAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // If invalid parameters

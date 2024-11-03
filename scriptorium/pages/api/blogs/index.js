@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         }
         
         // Check if we have a logged in user
-        const userId = verifyAuth(req);
+        const userId = await verifyAuth(req);
         let isAdmin = false;
         let currentUserId = null;
 
@@ -123,7 +123,6 @@ export default async function handler(req, res) {
                     break;
                 case 'reports':
                     // Verify that the user is an admin
-                    const userId = verifyAuth(req);
                     if (!userId) {
                         return res.status(401).json({ error: "Unauthorized action" });
                     }

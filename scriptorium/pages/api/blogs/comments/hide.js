@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     if (!id) return res.status(400).json({ error: "Comment ID is invalid" });
 
-    const userId = verifyAuth(req);
+    const userId = await verifyAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // Ensure the current user is admin
