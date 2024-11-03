@@ -27,7 +27,7 @@ model User {
   Blog        Blog[]
   Comment     Comment[]
   Template    Template[] // All the templates this user has created
-  role        String    @default("USER")
+  role        String?    @default("USER")
   BlogReport BlogReport[]
   CommentReport CommentReport[]
 
