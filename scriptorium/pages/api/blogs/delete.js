@@ -1,16 +1,15 @@
 // Create endpoint for blogs
-import { verifyToken } from '@/utils/auth';
+import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
+    if (req.method !== 'DELETE') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
     // Get the currently logged in user (if exists)
-    const accessToken = verifyToken(req.headers.authorization);
-    if (!accessToken) return res.status(401).json({ error: 'Unauthorized action' });
-    const userId = accessToken.userId;
+    const userId = await verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // Get the blog ID
     let { id } = req.body;
@@ -20,8 +19,11 @@ export default async function handler(req, res) {
         // Delete entry from database
         const blog = await prisma.blog.delete({
             where: {
-                id: Number(id),
+                id,
                 userId
+            },
+            include: {
+                templates: true
             }
         })
         return res.status(200).json(blog);

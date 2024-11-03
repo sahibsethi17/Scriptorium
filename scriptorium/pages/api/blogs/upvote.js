@@ -1,43 +1,99 @@
 // Upvote endpoint for blogs
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { verifyAuth } from '@/utils/auth';
+import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Diff is how much the upvote will change by (either 1 or -1)
-    let { id, diff } = req.body;
+    const userId = await verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
-    // If invalid parameters
-    if (!id) return res.status(400).json({ error: "Blog ID is invalid" });
-    if (!diff) return res.status(400).json({ error: "Diff is invalid" });
+    const { id, diff } = req.body;
+    if (!id || typeof diff !== 'number') {
+        return res.status(400).json({ error: "Invalid parameters" });
+    }
 
+    // GENERATED WITH CHATGPT
     try {
-        // Get current number of upvotes
-        const { upvotes } = await prisma.blog.findUnique({
+        // Check if a vote already exists for this user and blog
+        const existingVote = await prisma.blogVote.findUnique({
             where: {
-                id: Number(id)
-            },
-        })
-        if (typeof upvotes === 'null') {
-            return res.status(404).json({ error: "Blog not found" });
-        }
-        if (upvotes == 0 && diff == -1) {
-            return res.status(409).json({ error: "Upvotes cannot be decremented at 0" });
-        }
-        // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update -- used for updating database entries
-        const blog = await prisma.blog.update({
-            where: {
-                id: Number(id)
-            },
-            data: {
-                upvotes: Number(upvotes) + diff
+                userId_blogId: { userId: Number(userId), blogId: Number(id) },
             }
-        })
-        return res.status(200).json(blog);
-    } catch(err) {
+        });
+
+        // If user is trying to upvote
+        if (diff === 1) {
+            if (existingVote) {
+                if (existingVote.type === "UPVOTE") {
+                    return res.status(409).json({ error: "You have already upvoted this blog post." });
+                } else if (existingVote.type === "DOWNVOTE") {
+                    // Decrement downvotes by 1
+                    await prisma.blog.update({
+                        where: { id: Number(id) },
+                        data: {
+                            downvotes: { decrement: 1 },
+                        }
+                    });
+                    await prisma.blogVote.update({
+                        where: { id: existingVote.id },
+                        data: { type: "UPVOTE" }
+                    });
+                }
+                // Increment upvotes by 1
+                await prisma.blog.update({
+                    where: { id: Number(id) },
+                    data: {
+                        upvotes: { increment: 1 },
+                    }
+                });
+                await prisma.blogVote.update({
+                    where: { id: existingVote.id },
+                    data: { type: "UPVOTE" }
+                });
+            } else {
+                // Add a new UPVOTE
+                await prisma.blog.update({
+                    where: { id: Number(id) },
+                    data: { upvotes: { increment: 1 } }
+                });
+                await prisma.blogVote.create({
+                    data: {
+                        userId: Number(userId),
+                        blogId: Number(id),
+                        type: "UPVOTE"
+                    }
+                });
+            }
+        } else if (diff === -1) {
+            if (existingVote) {
+                if (existingVote.type === "UPVOTE") {
+                    await prisma.blog.update({
+                        where: { id: Number(id) },
+                        data: {
+                            upvotes: { decrement: 1 },
+                        }
+                    });
+                }
+                await prisma.blogVote.update({
+                    where: { id: existingVote.id },
+                    data: { type: "" }
+                });
+            } else {
+                return res.status(400).json({ error: "Cannot unupvote a post you haven't upvoted" })
+            }
+        }
+
+        const updatedBlog = await prisma.blog.findUnique({
+            where: { id: Number(id) }
+        });
+
+        return res.status(200).json(updatedBlog);
+
+    } catch (err) {
+        console.error("Error updating blog vote:", err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 }

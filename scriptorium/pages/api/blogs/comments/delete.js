@@ -1,11 +1,14 @@
 // Delete endpoint for comments
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { verifyAuth } from '@/utils/auth';
+import { prisma } from "@/utils/db";
 
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
+    if (req.method !== 'DELETE') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
+
+    const userId = await verifyAuth(req);
+    if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     let { id } = req.body;
 
@@ -16,7 +19,8 @@ export default async function handler(req, res) {
         // Delete entry from database
         const comment = await prisma.comment.delete({
             where: {
-                id: Number(id)
+                id,
+                userId
             }
         })
         return res.status(200).json(comment);
