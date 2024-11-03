@@ -22,7 +22,7 @@ model User {
   firstName   String
   lastName    String
   phoneNumber BigInt
-  avatar      String?
+  avatar      String?   // Optional field for avatar path
   createdAt   DateTime  @default(now())
   Blog        Blog[]
   Comment     Comment[]

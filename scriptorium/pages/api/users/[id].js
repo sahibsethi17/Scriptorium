@@ -1,4 +1,3 @@
-// [id].js
 import { prisma } from "@/utils/db";
 import { hashPassword } from "@/utils/auth";
 
@@ -11,33 +10,32 @@ export default async function handler(req, res) {
 
   try {
     switch (req.method) {
-      case "GET": {
+      case 'GET': {
         const user = await prisma.user.findUnique({
           where: { id: parseInt(id, 10) },
-          select: {
-            id: true,
-            email: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            phoneNumber: true,
-            avatar: true, // Include avatar path
-            createdAt: true,
-          },
         });
 
         if (!user) {
           return res.status(404).json({ error: "User not found." });
         }
 
-        return res.status(200).json({ user });
+        const serializedUser = JSON.stringify(user, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        );
+
+        return res.status(200).json({ user: serializedUser });
       }
 
-      case "PUT": {
-        const { email, password, username, firstName, lastName, phoneNumber, avatarPath } = req.body;
+      case 'PUT': {
+        const { email, password, username, firstName, lastName, phoneNumber } = req.body;
 
-        if (!email && !password && !username && !firstName && !lastName && !phoneNumber && !avatarPath) {
+        if (!email && !password && !username && !firstName && !lastName && !phoneNumber) {
           return res.status(400).json({ error: "Please provide at least one field to update." });
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({ error: "Invalid email format." });
         }
 
         const updateData = {
@@ -46,7 +44,6 @@ export default async function handler(req, res) {
           firstName,
           lastName,
           phoneNumber,
-          avatar: avatarPath || undefined, // Update avatar path if provided
         };
 
         if (password) {
@@ -61,22 +58,27 @@ export default async function handler(req, res) {
           data: updateData,
         });
 
-        return res.status(200).json({ message: "User updated successfully", user: updatedUser });
+        const serializedUser = JSON.stringify(updatedUser, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        );
+
+        return res.status(200).json({ message: "User updated successfully", user: serializedUser });
       }
 
-      case "DELETE": {
+      case 'DELETE': {
         const user = await prisma.user.findUnique({
           where: { id: parseInt(id, 10) },
         });
-
+      
         if (!user) {
           return res.status(404).json({ error: "User not found." });
         }
-
+      
+        // Proceed with deletion if the user exists
         await prisma.user.delete({
           where: { id: parseInt(id, 10) },
         });
-
+      
         return res.status(200).json({ message: "User deleted successfully" });
       }
 
