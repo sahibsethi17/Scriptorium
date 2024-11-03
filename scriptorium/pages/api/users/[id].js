@@ -1,30 +1,5 @@
 import { prisma } from "@/utils/db";
 import { hashPassword } from "@/utils/auth";
-import formidable from "formidable";
-import path from "path";
-
-// Disable Next.js default body parser
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// Helper function to initialize formidable
-const parseForm = (req) => {
-  const form = formidable({
-    uploadDir: path.join(process.cwd(), "public/uploads/avatars"),
-    keepExtensions: true,
-    filename: (name, ext) => `${name}-${Date.now()}${ext}`,
-  });
-
-  return new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      resolve({ fields, files });
-    });
-  });
-};
 
 export default async function handler(req, res) {
   const { id } = req.query;
@@ -48,24 +23,13 @@ export default async function handler(req, res) {
           typeof value === "bigint" ? value.toString() : value
         );
 
-        return res.status(200).json({ user: serializedUser });
+        return res.status(200).json({ user: JSON.parse(serializedUser) });
       }
 
       case "PUT": {
-        // Parse form data and files
-        const { fields, files } = await parseForm(req);
+        const { email, password, username, firstName, lastName, phoneNumber, avatar } = req.body;
 
-        const { email, password, username, firstName, lastName, phoneNumber } = fields;
-
-        if (
-          !email &&
-          !password &&
-          !username &&
-          !firstName &&
-          !lastName &&
-          !phoneNumber &&
-          !files.avatar
-        ) {
+        if (!email && !password && !username && !firstName && !lastName && !phoneNumber && !avatar) {
           return res.status(400).json({ error: "Please provide at least one field to update." });
         }
 
@@ -82,6 +46,7 @@ export default async function handler(req, res) {
           firstName,
           lastName,
           phoneNumber: phoneNumber ? BigInt(phoneNumber) : undefined,
+          avatar: avatar || undefined,
         };
 
         if (password) {
@@ -89,11 +54,6 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: "Password must be at least 8 characters long." });
           }
           updateData.password = await hashPassword(password);
-        }
-
-        // If a new avatar file is uploaded, update the avatar path
-        if (files.avatar) {
-          updateData.avatar = `/uploads/avatars/${path.basename(files.avatar.filepath)}`;
         }
 
         const updatedUser = await prisma.user.update({
@@ -107,7 +67,7 @@ export default async function handler(req, res) {
 
         return res
           .status(200)
-          .json({ message: "User updated successfully", user: serializedUser });
+          .json({ message: "User updated successfully", user: JSON.parse(serializedUser) });
       }
 
       case "DELETE": {
@@ -119,7 +79,6 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "User not found." });
         }
 
-        // Proceed with deletion if the user exists
         await prisma.user.delete({
           where: { id: parseInt(id, 10) },
         });

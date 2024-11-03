@@ -4,12 +4,7 @@ cd scriptorium
 
 # Install all required packages via npm
 npm install
-npm install formidable
-npm install path
 
-npm install formidable
-
-npm install path
 # Run all migrations
 npx prisma migrate dev --name init
 
@@ -54,7 +49,8 @@ curl -X POST http://localhost:3000/api/users/signup \
   "role": "ADMIN",
   "firstName": "Admin",
   "lastName": "User",
-  "phoneNumber": 1234567890
+  "phoneNumber": 1234567890,
+  "avatar": "@/scriptorium/public/uploads/avatars/man.png",
 }'
 echo "Admin user created successfully."
 
