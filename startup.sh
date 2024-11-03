@@ -1,12 +1,14 @@
+#!/bin/bash
+
 cd scriptorium
 
-# install all required packages via npm
+# Install all required packages via npm
 npm install
 
-# run all migrations
+# Run all migrations
 npx prisma migrate dev --name init
 
-# check that the required compilers/interpreters are already installed
+# Check that the required compilers/interpreters are already installed
 echo "Checking for required compilers and interpreters..."
 if ! command -v gcc &> /dev/null; then
     echo "GCC is not installed. Please install GCC to run C code."
@@ -21,12 +23,38 @@ if ! command -v javac &> /dev/null; then
 fi
 
 if ! command -v python3 &> /dev/null; then
-    echo "Python3 is not installed. Please install Python3 to run Python code."
+    echo "Python3 is not installed. Please install Python to run Python code."
 fi
 
 if ! command -v node &> /dev/null; then
     echo "Node.js is not installed. Please install Node.js to run JavaScript code."
 fi
-# create admin user
 
-cd ..
+
+echo "Starting the server..."
+npm run dev & 
+SERVER_PID=$!
+
+
+echo "Waiting for server to start..."
+sleep 2
+
+echo "Creating admin user..."
+curl -X POST http://localhost:3000/api/users/signup \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "admin@example.com",
+  "password": "adminPassword",
+  "username": "admin",
+  "role": "ADMIN",
+  "firstName": "Admin",
+  "lastName": "User",
+  "phoneNumber": 1234567890
+}'
+echo "Admin user created successfully."
+
+
+echo "Stopping the server..."
+kill $SERVER_PID
+
+echo "Setup complete."

@@ -31,14 +31,13 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
+  if (req.method === 'POST') {
 
   try {
-    // Parse form data and files
     const { fields, files } = await parseForm(req);
 
-    const { email, password, username, firstName, lastName, phoneNumber } = fields;
+    const { email, password, username, firstName, lastName, phoneNumber, avatar, role} = fields;
 
-    // Validate required fields
     if (!email || !password || !username || !firstName || !lastName || !phoneNumber) {
       return res.status(400).json({ error: "Please provide all the required fields." });
     }
@@ -74,6 +73,7 @@ export default async function handler(req, res) {
         lastName,
         phoneNumber: BigInt(phoneNumber),
         avatar: avatarPath,
+        role
       },
     });
 
@@ -86,4 +86,5 @@ export default async function handler(req, res) {
     console.error("Error creating user:", error);
     return res.status(500).json({ error: "User creation failed. Please try again later." });
   }
+}
 }

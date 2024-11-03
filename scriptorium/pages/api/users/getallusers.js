@@ -13,6 +13,7 @@ export default async function handler(req, res) {
                     lastName: true,
                     phoneNumber: true,
                     avatar: true, // Include avatar path
+                    role: true
                 },
             });
 

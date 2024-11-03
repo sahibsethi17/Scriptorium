@@ -8,3 +8,11 @@ export function removeDuplicateTags(tags) {
     }
     return [...new Set(tagArray)].join(",");
 }
+
+export function convertToArray(templateIds) {
+    const templateIdArray = templateIds.split(',');
+    for (let i = 0; i < templateIdArray.length; i++) {
+        templateIdArray[i] = Number(templateIdArray[i]);
+    }
+    return templateIdArray;
+}

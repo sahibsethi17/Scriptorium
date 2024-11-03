@@ -2,7 +2,6 @@ import { prisma } from "@/utils/db";
 import { hashPassword } from "@/utils/auth";
 import formidable from "formidable";
 import path from "path";
-import fs from "fs/promises";
 
 // Disable Next.js default body parser
 export const config = {
