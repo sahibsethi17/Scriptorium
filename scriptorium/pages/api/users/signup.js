@@ -1,11 +1,10 @@
 import { prisma } from "@/utils/db";
 import { hashPassword } from "@/utils/auth";
 
-
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email, password, username, firstName, lastName, phoneNumber, role } = req.body;
-    
+    const { email, password, username, firstName, lastName, phoneNumber, avatar } = req.body;
+
     if (!email || !password || !username || !firstName || !lastName || !phoneNumber) {
       return res.status(400).json({ error: "Please provide all the required fields." });
     }
@@ -21,9 +20,7 @@ export default async function handler(req, res) {
 
     try {
       const existingUser = await prisma.user.findUnique({
-        where: {
-          email: email,
-        },
+        where: { email },
       });
 
       if (existingUser) {
@@ -39,24 +36,21 @@ export default async function handler(req, res) {
           password: hashedPassword,
           firstName,
           lastName,
-          phoneNumber,
-          role
+          phoneNumber, 
+          avatar,
         },
       });
 
-      const serializedUser = JSON.stringify(user, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
+      const serializedUser = JSON.parse(
+        JSON.stringify(user, (key, value) => (typeof value === "bigint" ? value.toString() : value))
       );
 
-      return res.status(201).send({ message: 'User created successfully', serializedUser });
-
-      
+      return res.status(201).json({ message: "User created successfully", user: serializedUser });
     } catch (error) {
       console.error("Error creating user:", error);
-      return res.status(500).json({ error: 'User creation failed. Please try again later.' });
+      return res.status(500).json({ error: "User creation failed. Please try again later." });
     }
-    
   } else {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ message: "Method not allowed" });
   }
 }
