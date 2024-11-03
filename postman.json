@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "e7f616df-37ec-452e-b153-c3735fa8b463",
 		"name": "Project part 1",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "36785564"
 	},
 	"item": [
@@ -23,7 +23,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/users/signup"
+						"url": {
+							"raw": "http://localhost:3000/api/users/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"signup"
+							]
+						}
 					},
 					"response": []
 				},
@@ -76,7 +88,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/auth/login"
+						"url": {
+							"raw": "http://localhost:3000/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
 					},
 					"response": []
 				},
@@ -112,9 +136,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [
@@ -133,7 +161,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/auth/logout"
+						"url": {
+							"raw": "http://localhost:3000/api/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
 					},
 					"response": []
 				},
@@ -142,7 +182,19 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://localhost:3000/api/users/getallusers"
+						"url": {
+							"raw": "http://localhost:3000/api/users/getallusers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"getallusers"
+							]
+						}
 					},
 					"response": []
 				},
@@ -151,7 +203,19 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": "http://localhost:3000/api/users/15"
+						"url": {
+							"raw": "http://localhost:3000/api/users/15",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"15"
+							]
+						}
 					},
 					"response": []
 				},
@@ -169,7 +233,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/users/15"
+						"url": {
+							"raw": "http://localhost:3000/api/users/15",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"15"
+							]
+						}
 					},
 					"response": []
 				},
@@ -187,7 +263,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/users/15"
+						"url": {
+							"raw": "http://localhost:3000/api/users/15",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"15"
+							]
+						}
 					},
 					"response": []
 				}
@@ -201,9 +289,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -216,7 +308,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/create"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"create"
+							]
+						}
 					},
 					"response": []
 				},
@@ -228,9 +332,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -294,9 +402,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -309,7 +421,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/report"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/report",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -318,9 +442,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -333,7 +461,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/unhide"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/unhide",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"unhide"
+							]
+						}
 					},
 					"response": []
 				},
@@ -342,9 +482,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -357,7 +501,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/hide"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/hide",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"hide"
+							]
+						}
 					},
 					"response": []
 				},
@@ -366,9 +522,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -381,7 +541,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/edit"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/edit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"edit"
+							]
+						}
 					},
 					"response": []
 				},
@@ -390,9 +562,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -405,7 +581,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/downvote"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/downvote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"downvote"
+							]
+						}
 					},
 					"response": []
 				},
@@ -414,9 +602,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -429,7 +621,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/upvote"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/upvote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"upvote"
+							]
+						}
 					},
 					"response": []
 				},
@@ -438,9 +642,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "DELETE",
 						"header": [],
@@ -453,7 +661,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/delete"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"delete"
+							]
+						}
 					},
 					"response": []
 				}
@@ -467,9 +687,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -482,7 +706,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/unhide"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/unhide",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"unhide"
+							]
+						}
 					},
 					"response": []
 				},
@@ -491,9 +728,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -506,7 +747,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/hide"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/hide",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"hide"
+							]
+						}
 					},
 					"response": []
 				},
@@ -515,9 +769,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -530,7 +788,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/report"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/report",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"report"
+							]
+						}
 					},
 					"response": []
 				},
@@ -539,9 +810,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -554,7 +829,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/downvote"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/downvote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"downvote"
+							]
+						}
 					},
 					"response": []
 				},
@@ -563,9 +851,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -578,7 +870,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/upvote"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/upvote",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"upvote"
+							]
+						}
 					},
 					"response": []
 				},
@@ -587,9 +892,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "DELETE",
 						"header": [],
@@ -602,7 +911,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/delete"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"delete"
+							]
+						}
 					},
 					"response": []
 				},
@@ -611,9 +933,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [],
@@ -626,7 +952,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/edit"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/edit",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"edit"
+							]
+						}
 					},
 					"response": []
 				},
@@ -638,9 +977,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -689,9 +1032,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
@@ -704,7 +1051,20 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/blogs/comments/create"
+						"url": {
+							"raw": "http://localhost:3000/api/blogs/comments/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"blogs",
+								"comments",
+								"create"
+							]
+						}
 					},
 					"response": []
 				}
@@ -718,9 +1078,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [
@@ -739,7 +1103,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				},
@@ -763,7 +1138,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				},
@@ -787,7 +1173,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				},
@@ -811,7 +1208,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				},
@@ -835,7 +1243,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				},
@@ -859,7 +1278,18 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/execute"
+						"url": {
+							"raw": "http://localhost:3000/api/execute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"execute"
+							]
+						}
 					},
 					"response": []
 				}
@@ -873,9 +1303,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "DELETE",
 						"header": [
@@ -894,7 +1328,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/templates/2"
+						"url": {
+							"raw": "http://localhost:3000/api/templates/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"templates",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -903,9 +1349,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "PUT",
 						"header": [
@@ -924,7 +1374,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/templates/2"
+						"url": {
+							"raw": "http://localhost:3000/api/templates/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"templates",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -936,9 +1398,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [
@@ -957,7 +1423,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/templates/2"
+						"url": {
+							"raw": "http://localhost:3000/api/templates/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"templates",
+								"2"
+							]
+						}
 					},
 					"response": []
 				},
@@ -966,9 +1444,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [
@@ -987,7 +1469,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/templates/create"
+						"url": {
+							"raw": "http://localhost:3000/api/templates/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"templates",
+								"create"
+							]
+						}
 					},
 					"response": []
 				},
@@ -999,9 +1493,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [
@@ -1047,9 +1545,13 @@
 					"request": {
 						"auth": {
 							"type": "bearer",
-							"bearer": {
-								"token": "{{accessToken}}"
-							}
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [
@@ -1068,7 +1570,19 @@
 								}
 							}
 						},
-						"url": "http://localhost:3000/api/templates/run-template"
+						"url": {
+							"raw": "http://localhost:3000/api/templates/run-template",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"templates",
+								"run-template"
+							]
+						}
 					},
 					"response": []
 				}
