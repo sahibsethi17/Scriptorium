@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   // Destructure request body with defaults
   const { language, code, stdin = [], saveAsTemplate = false, title = "", explanation = "", tags = "" } = req.body;
-  const userId = verifyAuth(req);
+  const userId = await verifyAuth(req);
 
   // Validate that code is provided
   if (!code || !language) {
