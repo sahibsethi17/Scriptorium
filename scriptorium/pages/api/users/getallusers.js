@@ -3,7 +3,6 @@ import { prisma } from "@/utils/db";
 export default async function handler(req, res) {
     if (req.method === 'GET') {
         try {
-            // Fetch all users and select specific fields, including the avatar path
             const users = await prisma.user.findMany({
                 select: {
                     id: true,

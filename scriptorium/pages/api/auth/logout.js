@@ -1,4 +1,3 @@
-// pages/api/logout.js
 import { serialize } from 'cookie';
 
 export default function handler(req, res) {
