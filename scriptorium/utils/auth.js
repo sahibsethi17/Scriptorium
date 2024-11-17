@@ -75,41 +75,44 @@ export function verifyToken(token) {
 
 export async function verifyAuth(req) {
     try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return null;
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return null;
   
-    try {
-      const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
-      return user.userId;
-    } catch (error) {
-      return null;
-    }
-    } catch (error) { // If access token is expired
+      try {
+        const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
+        return user.userId;
+      } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            const refreshToken = req.cookies.refreshToken;
-            if (!refreshToken) {
-                return res.status(401).json({ error: 'This user is not logged in.' });
+          const refreshToken = req.cookies.refreshToken;
+          if (!refreshToken) {
+            return { error: 'User is not logged in.', status: 401 };
+          }
+          
+          if (isTokenExpired(refreshToken)) {
+            try {
+              const response = await axios.post('/api/logout');
+              return response.data;
+            } catch (logoutError) {
+              console.error('Logout failed:', logoutError);
+              throw logoutError;
             }
-            if (isTokenExpired(refreshToken)) {
-                try {
-                    const response = await axios.post('/api/logout');
-                    return response.data;
-                  } catch (error) {
-                    console.error('Logout failed:', error);
-                    throw error;
-                  }
-            } else {
+          } else {
             const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
             const payload = { userId: user.userId, username: user.username };
-            generateAccessToken(payload);
-            return user.userId;
-            }
+            const newAccessToken = generateAccessToken(payload);
+            return { userId: user.userId, newAccessToken };
+          }
         } else {
-            return null;
+          console.error('Token verification error:', error);
+          return null;
         }
-
+      }
+    } catch (error) {
+      console.error('An error occurred in verifyAuth:', error);
+      return null;
     }
   }
+  
 
 
   

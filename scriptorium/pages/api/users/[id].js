@@ -1,11 +1,24 @@
 import { prisma } from "@/utils/db";
-import { hashPassword } from "@/utils/auth";
+import { hashPassword, verifyAuth } from "@/utils/auth";
 
 export default async function handler(req, res) {
   const { id } = req.query;
 
+  const userId = await verifyAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized action" });
+
   if (!id) {
     return res.status(400).json({ error: "User ID is required." });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: parseInt(userId, 10) },
+  });
+
+  const role = user.role;
+
+  if (parseInt(userId, 10) !== parseInt(id, 10) && role.toLowerCase() !== 'admin') {
+    return res.status(401).json({ error: "Unauthorized action" });
   }
 
   try {

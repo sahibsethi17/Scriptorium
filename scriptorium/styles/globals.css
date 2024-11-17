@@ -1,3 +1,4 @@
+/* styles/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,4 +25,22 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+
+/* Add any custom Tailwind classes */
+.container {
+  @apply bg-light-gray p-6 shadow-custom-light rounded-lg;
+}
+
+.editor-box {
+  @apply bg-editor-bg border border-gray-300 rounded p-4 text-lg font-mono;
+}
+
+.button-run {
+  @apply bg-primary-blue text-white font-semibold py-2 px-4 rounded hover:bg-blue-600;
+}
+
+.output-box {
+  @apply bg-gray-50 border border-gray-300 p-4 rounded;
 }

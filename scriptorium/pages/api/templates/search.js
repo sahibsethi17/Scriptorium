@@ -6,31 +6,48 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { query, tags } = req.query;
+  const { tag, title, explanation } = req.query;
 
-  // Convert tags to an array if it's provided, otherwise leave it empty
-  const tagsArray = tags ? tags.split(',') : [];
+  if (!tag && !title && !explanation) {
+    return res.status(400).json({ error: 'A search parameter (tag, title, or explanation) is required' });
+  }
 
   try {
+    const searchConditions = [];
+
+    if (tag) {
+      searchConditions.push({
+        tags: {
+          contains: tag,
+        },
+      });
+    }
+
+    if (title) {
+      searchConditions.push({
+        title: {
+          contains: title.toLowerCase(),  
+        },
+      });
+    }
+
+    if (explanation) {
+      searchConditions.push({
+        explanation: {
+          contains: explanation.toLowerCase(),  
+        },
+      });
+    }
+
     const templates = await prisma.template.findMany({
       where: {
-        OR: [
-          { title: { contains: query || '' } },
-          { explanation: { contains: query || '' } },
-          { tags: { contains: query || '' } },
-        ],
-        AND: tagsArray.length > 0
-          ? tagsArray.map(tag => ({
-              tags: { contains: tag }
-            }))
-          : []
+        OR: searchConditions,
       },
-      orderBy: { createdAt: 'desc' },
     });
 
-    return res.status(200).json({ templates });
+    res.status(200).json({ templates });
   } catch (error) {
-    console.error("Search failed with error:", error);
-    return res.status(500).json({ error: 'Search failed', details: error.message });
+    console.error("Template search error:", error);
+    res.status(500).json({ error: 'Template search failed', details: error.message });
   }
 }
