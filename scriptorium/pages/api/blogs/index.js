@@ -1,6 +1,6 @@
 // Getter endpoint for blogs
 import { verifyAuth } from '@/utils/auth';
-import { convertToArray } from '@/utils/blog-utils';
+import { paginate } from '@/utils/paginate';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         }
 
     } else { // If at least one parameter is provided
-        const { id, title, description, tags, order, templateQuery, templateTags } = req.query;
+        const { id, title, description, tags, order, templateQuery, templateTags, pageNum } = req.query;
 
         // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- used for filtering and sorting
         let filter = { AND: [] };
@@ -141,14 +141,15 @@ export default async function handler(req, res) {
 
         // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- how to use the orderBy keyword
         try {
-            const blogs = await prisma.blog.findMany({
+            let blogs = await prisma.blog.findMany({
                 orderBy: orderBy,
                 where: filter,
-                include: {
-                    templates: true,
-                    comments: true  
-                }
+                // include: {
+                //     templates: true,
+                //     comments: true  
+                // }
             });
+            if (pageNum) blogs = paginate(blogs, pageNum);
             return res.status(200).json(blogs);
         } catch(err) {
             console.log(err);
