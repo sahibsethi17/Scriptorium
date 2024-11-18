@@ -84,8 +84,6 @@ export default async function handler(req, res) {
             } else {
                 return res.status(400).json({ error: "Cannot undownvote a post you haven't downvoted" })
             }
-        } else {
-            return res.status(400).json({ error: "Invalid diff value" });
         }
 
         const updatedComment = await prisma.comment.findUnique({

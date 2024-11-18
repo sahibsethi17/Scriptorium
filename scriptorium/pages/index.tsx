@@ -1,9 +1,6 @@
-// pages/index.tsx
-import React from 'react';
-import App from '../src/App';
+import React from "react";
+import LandingPage from "./LandingPage";
 
-const HomePage: React.FC = () => {
-  return <App />;
-};
+const IndexPage: React.FC = () => <LandingPage />;
 
-export default HomePage;
+export default IndexPage;

@@ -9,17 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.6.0",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^5.21.1",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.3",
     "cookie": "^1.0.1",
     "cookie-parser": "^1.4.7",
-    "dockerode": "^4.0.2",
-    "express": "^4.21.1",
     "formidable": "^3.5.2",
+    "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "multer": "^1.4.5-lts.1",
@@ -28,16 +27,13 @@
     "path": "^0.12.7",
     "react": "^18",
     "react-dom": "^18",
-    "react-hook-form": "^7.53.2",
-    "uuid": "^11.0.3"
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
-    "@types/node": "22.9.0",
-    "@types/react": "18.3.12",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
-    "prisma": "^5.22.0",
+    "prisma": "^5.21.1",
     "tailwindcss": "^3.4.15",
-    "typescript": "latest"
+    "typescript": "^5.6.3"
   }
 }

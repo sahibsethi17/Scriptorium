@@ -1,11 +1,13 @@
-import { prisma } from "@/utils/db";
-import { hashPassword, verifyAuth } from "@/utils/auth";
+import { prisma } from "../../../utils/db";
+import { hashPassword, verifyAuth } from "../../../utils/auth";
 
 export default async function handler(req, res) {
   const { id } = req.query;
 
   const userId = await verifyAuth(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized action" });
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized action" });
+  }
 
   if (!id) {
     return res.status(400).json({ error: "User ID is required." });
@@ -32,7 +34,10 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: "User not found." });
         }
 
-        const serializedUser = JSON.stringify(user, (key, value) =>
+        // Exclude the password field from the response
+        const { password, ...userWithoutPassword } = user;
+
+        const serializedUser = JSON.stringify(userWithoutPassword, (key, value) =>
           typeof value === "bigint" ? value.toString() : value
         );
 
@@ -74,7 +79,10 @@ export default async function handler(req, res) {
           data: updateData,
         });
 
-        const serializedUser = JSON.stringify(updatedUser, (key, value) =>
+        // Exclude the password field from the response
+        const { password: _, ...updatedUserWithoutPassword } = updatedUser;
+
+        const serializedUser = JSON.stringify(updatedUserWithoutPassword, (key, value) =>
           typeof value === "bigint" ? value.toString() : value
         );
 

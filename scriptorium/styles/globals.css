@@ -1,46 +1,194 @@
-/* styles/globals.css */
+/* GENERATED WITH CHATGPT */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Global Theme Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /* Light mode background */
+  --foreground: #171717; /* Light mode text */
+  --primary: #2563eb; /* Primary blue for accents */
+  --code-bg: #f5f5f5; /* Light mode code block background */
+  --code-text: #1e1e1e; /* Light mode code text */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a1a1a; /* Dark mode background */
+    --foreground: #e5e5e5; /* Dark mode text */
+    --primary: #60a5fa; /* Lighter blue in dark mode */
+    --code-bg: #272727; /* Dark mode code block background */
+    --code-text: #e0e0e0; /* Dark mode code text */
   }
 }
 
+/* Global Styles */
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
 }
 
+/* Code Block Styling */
+pre, code {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: "Fira Code", monospace;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+/* Button Styling */
+button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background: #1d4ed8; /* Darker blue on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.875rem;
+  }
+
+  pre, code {
+    font-size: 0.8rem;
+  }
+}
+
+/* Utilities */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .code-container {
+    @apply p-4 rounded bg-[var(--code-bg)] text-[var(--code-text)];
+  }
 }
 
-
-/* Add any custom Tailwind classes */
-.container {
-  @apply bg-light-gray p-6 shadow-custom-light rounded-lg;
+/* Landing Page Styles */
+#landing-page {
+  @apply min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-b from-gray-200 to-gray-100;
 }
 
-.editor-box {
-  @apply bg-editor-bg border border-gray-300 rounded p-4 text-lg font-mono;
+#landing-title {
+  @apply text-4xl md:text-6xl font-bold text-gray-800;
 }
 
-.button-run {
-  @apply bg-primary-blue text-white font-semibold py-2 px-4 rounded hover:bg-blue-600;
+#landing-subtitle {
+  @apply text-lg md:text-xl text-gray-600 mt-4;
 }
 
-.output-box {
-  @apply bg-gray-50 border border-gray-300 p-4 rounded;
+#landing-button {
+  @apply mt-8 px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700;
+}
+
+/* Fade and Slide Animation */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-slide {
+  animation: fadeSlideIn 1.5s ease-in-out;
+}
+
+/* Fade and Slide-In Animations */
+@keyframes fadeSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-slide-left {
+  animation: fadeSlideInLeft 1.5s ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 1.5s ease-in-out;
+}
+/* Keyframes for Animations */
+@keyframes fadeSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation Classes */
+.animate-fade-slide-left {
+  animation: fadeSlideInLeft 1.5s ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 1.5s ease-in-out;
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 1.5s ease-in-out;
 }

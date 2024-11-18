@@ -28,6 +28,7 @@ model User {
   Comment     Comment[]
   Template    Template[] // All the templates this user has created
   role        String?    @default("USER")
+  refreshToken  String?
   BlogReport BlogReport[]
   CommentReport CommentReport[]
 

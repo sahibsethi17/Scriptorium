@@ -1,2 +1,1 @@
-name = input()
-print('Hello, ' + name)
+whi

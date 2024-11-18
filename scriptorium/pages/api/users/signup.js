@@ -1,5 +1,5 @@
-import { prisma } from "@/utils/db";
-import { hashPassword } from "@/utils/auth";
+import { prisma } from "../../../utils/db";
+import { hashPassword } from "../../../utils/auth";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   try {
     const { email, password, username, firstName, lastName, phoneNumber, avatar, role } = req.body;
 
+    // Check for missing required fields
     if (!email || !password || !username || !firstName || !lastName || !phoneNumber) {
       return res.status(400).json({ error: "Please provide all the required fields." });
     }
@@ -38,11 +39,19 @@ export default async function handler(req, res) {
         lastName,
         phoneNumber: BigInt(phoneNumber),
         avatar: avatar || null,
-        role
+        role,
       },
     });
 
-    const serializedUser = JSON.stringify(user, (key, value) => typeof value === "bigint" ? value.toString() : value);
+    // Exclude the password field from the response
+    const { password: _, ...userWithoutPassword } = user;
+
+    // Serialize the user object to handle BigInt values
+    const serializedUser = JSON.stringify(userWithoutPassword, (key, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    );
+
+    // Sends the response without the password
     return res.status(201).json({ message: "User created successfully", user: JSON.parse(serializedUser) });
   } catch (error) {
     console.error("Error creating user:", error);

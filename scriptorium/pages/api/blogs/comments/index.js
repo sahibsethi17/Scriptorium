@@ -1,14 +1,13 @@
 // Getter endpoint for comments
 import { verifyAuth } from '@/utils/auth';
 import { prisma } from "@/utils/db";
-import { paginate } from '@/utils/paginate';
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { blogId, content, order, pageNum } = req.query;
+    const { blogId, content, order } = req.query;
 
     if (!blogId) return res.status(400).json({ error: "Blog ID is invalid" });
 
@@ -75,11 +74,10 @@ export default async function handler(req, res) {
 
     // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- how to use the orderBy keyword
     try {
-        let comments = await prisma.comment.findMany({
+        const comments = await prisma.comment.findMany({
             orderBy: orderBy,
             where: filter
         });
-        if (pageNum) comments = paginate(comments, pageNum);
         return res.status(200).json(comments);
     } catch(err) {
         console.log(err);

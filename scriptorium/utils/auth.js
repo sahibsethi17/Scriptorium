@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import { prisma } from "./db";
+
 
 const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS);
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -74,69 +76,50 @@ export function verifyToken(token) {
 }
 
 export async function verifyAuth(req) {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return null;
+
     try {
-      const token = req.headers.authorization?.split(' ')[1];
-      if (!token) return null;
-  
-      try {
-        const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
-        return user.userId;
-      } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-          const refreshToken = req.cookies.refreshToken;
-          if (!refreshToken) {
-            return { error: 'User is not logged in.', status: 401 };
-          }
-          
-          if (isTokenExpired(refreshToken)) {
-            try {
-              const response = await axios.post('/api/logout');
-              return response.data;
-            } catch (logoutError) {
-              console.error('Logout failed:', logoutError);
-              throw logoutError;
-            }
-          } else {
-            const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-            const payload = { userId: user.userId, username: user.username };
-            const newAccessToken = generateAccessToken(payload);
-            return { userId: user.userId, newAccessToken };
+      const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
+      return user.userId;
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+          return { error: 'User is not logged in.', status: 401 };
+        }
+
+        // Check if the refresh token is still valid in the database
+        const user = await prisma.user.findUnique({
+          where: { refreshToken },
+        });
+
+        if (!user) {
+          return { error: 'Refresh token is invalid or revoked.', status: 401 };
+        }
+        
+        if (isTokenExpired(refreshToken)) {
+          try {
+            await axios.post('/api/logout');
+            return { error: 'Session expired. Please log in again.', status: 401 };
+          } catch (logoutError) {
+            console.error('Logout failed:', logoutError);
+            throw logoutError;
           }
         } else {
-          console.error('Token verification error:', error);
-          return null;
+          const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+          const payload = { userId: user.userId, username: user.username };
+          const newAccessToken = generateAccessToken(payload);
+          return { userId: user.userId, newAccessToken };
         }
+      } else {
+        console.error('Token verification error:', error);
+        return null;
       }
-    } catch (error) {
-      console.error('An error occurred in verifyAuth:', error);
-      return null;
     }
+  } catch (error) {
+    console.error('An error occurred in verifyAuth:', error);
+    return null;
   }
-  
-
-
-  
-//   const refreshTokenHandler = async (req, res) => {
-//     try {
-//     const refreshToken = req.cookies.refreshToken;
-//     if (!refreshToken) {
-//         return res.status(401).json({ error: 'This user is not logged in.' });
-//     }
-
-//     const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-//     const payload = { userId: user.userId, username: user.username };
-//     const newAccessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-
-//     return res.status(200).json({ accessToken: newAccessToken });
-
-//     } catch (error) {
-//     if (error.name === 'TokenExpiredError') {
-//         return res.status(403).json({ error: 'Refresh token expired' }); // 
-//     }
-//     return res.status(403).json({ error: 'Invalid refresh token' });
-//     }
-//   };
-  
-//   export default refreshTokenHandler;
-  
+}
