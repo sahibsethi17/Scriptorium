@@ -68,7 +68,7 @@ const Login: React.FC = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 text-black border rounded-lg"
               required
             />
             <input
@@ -77,7 +77,7 @@ const Login: React.FC = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 text-black border rounded-lg"
               required
             />
             <button

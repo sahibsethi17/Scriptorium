@@ -7,7 +7,7 @@ import { useAuth } from "./components/AuthContext";
 
 const Profile: React.FC = () => {
   const router = useRouter();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [user, setUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     username: "",
@@ -19,19 +19,15 @@ const Profile: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fetch user data using the user ID from localStorage
   useEffect(() => {
-    // If the login status is still unknown, wait
     if (isLoggedIn === null) {
       return;
     }
 
-    console.log(isLoggedIn);
-
-    // // If user is not logged in, redirect to login page
     // if (!isLoggedIn) {
-    //   console.log("User is not authenticated. Redirecting to login page.");
     //   router.push("/login");
     //   return;
     // }
@@ -39,15 +35,13 @@ const Profile: React.FC = () => {
     const fetchUser = async () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
-        const userId = localStorage.getItem("userId"); // Retrieve user ID from localStorage
+        const userId = localStorage.getItem("userId");
 
-        // if (!accessToken || !userId) {
-        //   console.log("Access token or user ID is missing. Redirecting to login page.");
-        //   router.push("/login");
-        //   return;
-        // }
+        if (!accessToken || !userId) {
+          router.push("/login");
+          return;
+        }
 
-        // Make the request to fetch the user data
         const response = await axios.get(`/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -67,7 +61,6 @@ const Profile: React.FC = () => {
         });
         setLoading(false);
       } catch (err: any) {
-        console.error("Failed to fetch user data:", err);
         setError("Failed to load user data.");
         setLoading(false);
       }
@@ -76,12 +69,84 @@ const Profile: React.FC = () => {
     fetchUser();
   }, [isLoggedIn, router]);
 
-  // Show loading state
+  // Handle form input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle avatar change
+  const handleAvatarChange = (avatar: string) => {
+    setFormData({ ...formData, avatar });
+  };
+
+  // Handle form submission for updating user data
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const userId = localStorage.getItem("userId");
+
+      if (!accessToken || !userId) {
+        router.push("/login");
+        return;
+      }
+
+      await axios.put(
+        `/api/users/${userId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          withCredentials: true,
+        }
+      );
+
+      setSuccessMessage("Profile updated successfully!");
+    } catch (err: any) {
+      setError("Failed to update profile.");
+    }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const userId = localStorage.getItem("userId");
+
+      if (!accessToken || !userId) {
+        router.push("/login");
+        return;
+      }
+
+      setIsLoggedIn(false);
+
+      await axios.delete(`/api/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      });
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userId");
+      router.push("/");
+    } catch (err: any) {
+      setError("Failed to delete account.");
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-20">Loading...</div>;
   }
 
-  // Show error state
   if (error) {
     return <div className="text-center py-20 text-red-500">{error}</div>;
   }
@@ -91,59 +156,81 @@ const Profile: React.FC = () => {
       <Navbar />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12">
         <div className="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
-          <div className="flex items-center mb-6">
-            <img
-              src={`/uploads/avatars/${formData.avatar}`}
-              alt="User Avatar"
-              className="w-20 h-20 rounded-full mr-4"
-            />
-            <h1 className="text-3xl font-bold">
-              {user.firstName} {user.lastName}
-            </h1>
-          </div>
-
-          <form className="space-y-4">
+          <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
+          {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
+          <form onSubmit={handleUpdate} className="space-y-4">
             <input
               type="text"
               name="username"
               placeholder="Username"
               value={formData.username}
-              className="w-full p-3 border rounded-lg"
-              readOnly
+              onChange={handleChange}
+              className="w-full p-3 border text-black rounded-lg"
             />
             <input
               type="email"
               name="email"
               placeholder="Email"
               value={formData.email}
-              className="w-full p-3 border rounded-lg"
-              readOnly
+              onChange={handleChange}
+              className="w-full p-3 border text-black rounded-lg"
             />
             <input
               type="text"
               name="firstName"
               placeholder="First Name"
               value={formData.firstName}
-              className="w-full p-3 border rounded-lg"
-              readOnly
+              onChange={handleChange}
+              className="w-full p-3 border text-black rounded-lg"
             />
             <input
               type="text"
               name="lastName"
               placeholder="Last Name"
               value={formData.lastName}
-              className="w-full p-3 border rounded-lg"
-              readOnly
+              onChange={handleChange}
+              className="w-full p-3 border text-black rounded-lg"
             />
             <input
               type="tel"
               name="phoneNumber"
               placeholder="Phone Number"
               value={formData.phoneNumber}
-              className="w-full p-3 border rounded-lg"
-              readOnly
+              onChange={handleChange}
+              className="w-full p-3 border text-black rounded-lg"
             />
+
+            <div className="flex space-x-4">
+              <button
+                type="button"
+                onClick={() => handleAvatarChange("man.png")}
+                className={`p-2 rounded-lg ${formData.avatar === "man.png" ? "border-2 border-blue-500" : ""}`}
+              >
+                <img src="/uploads/avatars/man.png" alt="Man Avatar" className="w-16 h-16" />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAvatarChange("woman.png")}
+                className={`p-2 rounded-lg ${formData.avatar === "woman.png" ? "border-2 border-blue-500" : ""}`}
+              >
+                <img src="/uploads/avatars/woman.png" alt="Woman Avatar" className="w-16 h-16" />
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full p-3 mt-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+            >
+              Update Profile
+            </button>
           </form>
+
+          <button
+            onClick={handleDeleteAccount}
+            className="w-full p-3 mt-6 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700"
+          >
+            Delete Account
+          </button>
         </div>
       </div>
       <Footer />

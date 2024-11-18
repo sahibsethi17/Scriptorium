@@ -55,7 +55,7 @@ const Signup: React.FC = () => {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
             <input
@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
             <input
@@ -73,7 +73,7 @@ const Signup: React.FC = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
             <input
@@ -82,7 +82,7 @@ const Signup: React.FC = () => {
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
             <input
@@ -91,7 +91,7 @@ const Signup: React.FC = () => {
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
             <input
@@ -100,7 +100,7 @@ const Signup: React.FC = () => {
               placeholder="Phone Number"
               value={formData.phoneNumber}
               onChange={handleChange}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border text-black rounded-lg"
               required
             />
 
