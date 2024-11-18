@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
           </p>
           <button
             className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 animate-fade-slide-up"
-            onClick={() => window.location.href = "/code-editor"}
+            onClick={() => window.location.href = "/code_editor"}
           >
             Get Started
           </button>

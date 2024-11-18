@@ -27,23 +27,25 @@ const Profile: React.FC = () => {
       return;
     }
 
-    // If user is not logged in, redirect to login page
-    if (!isLoggedIn) {
-      console.log("User is not authenticated. Redirecting to login page.");
-      router.push("/login");
-      return;
-    }
+    console.log(isLoggedIn);
+
+    // // If user is not logged in, redirect to login page
+    // if (!isLoggedIn) {
+    //   console.log("User is not authenticated. Redirecting to login page.");
+    //   router.push("/login");
+    //   return;
+    // }
 
     const fetchUser = async () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId"); // Retrieve user ID from localStorage
 
-        if (!accessToken || !userId) {
-          console.log("Access token or user ID is missing. Redirecting to login page.");
-          router.push("/login");
-          return;
-        }
+        // if (!accessToken || !userId) {
+        //   console.log("Access token or user ID is missing. Redirecting to login page.");
+        //   router.push("/login");
+        //   return;
+        // }
 
         // Make the request to fetch the user data
         const response = await axios.get(`/api/users/${userId}`, {

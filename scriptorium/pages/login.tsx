@@ -4,12 +4,14 @@ import axios from "axios";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useRouter } from "next/router";
+import { useAuth } from "./components/AuthContext";
 
 const Login: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { setIsLoggedIn } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,13 +33,16 @@ const Login: React.FC = () => {
 
       const accessToken = response.data?.accessToken;
       if (accessToken) {
+        console.log(response.data.userId);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("userId", response.data.userId);
+
+        setIsLoggedIn(true);
 
         // Dispatch custom event to notify the app of login status change
         window.dispatchEvent(new Event("loginStatusChange"));
 
-        // Redirect to the homepage
+        // Redirect to the code editor Page (MAKE SURE TO UPDATE)
         router.push("/");
       } else {
         throw new Error("No access token received.");

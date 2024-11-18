@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       });
 
       res.setHeader('Set-Cookie', refreshTokenCookie);
-      res.status(200).json({ message: 'Login successful', accessToken });
+      res.status(200).json({ message: 'Login successful', accessToken, userId: user.id });
     } catch (error) {
       console.error("Login API Error:", error);
       res.status(500).json({ error: 'Login failed' });
