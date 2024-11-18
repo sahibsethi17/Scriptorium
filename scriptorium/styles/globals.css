@@ -192,3 +192,6 @@ button:hover {
 .animate-fade-slide-up {
   animation: fadeSlideUp 1.5s ease-in-out;
 }
+.margin-left-10 {
+  margin-left: 40px !important;
+}

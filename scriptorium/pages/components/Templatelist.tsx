@@ -18,6 +18,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
     const fetchTemplates = async () => {
       try {
         const response = await axios.get('/api/templates');
+        console.log(response);
         setTemplates(response.data.templates);
       } catch (error) {
         console.error('Error fetching templates:', error);
@@ -53,14 +54,14 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Templates</h2>
+      <h2 className="text-xl font-bold mb-4 text-black">Templates</h2>
       <div className="mb-4">
         <input
           type="text"
           value={searchTitle}
           onChange={(e) => setSearchTitle(e.target.value)}
           placeholder="Search by title"
-          className="w-full p-2 mb-2 border rounded border-gray-300"
+          className="w-full p-2 mb-2 border rounded border-gray-300 "
         />
         <input
           type="text"
@@ -79,7 +80,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
       </div>
       <div className="space-y-4">
         {filteredTemplates.map((template: any) => (
-          <div key={template.id} className="border rounded p-4 shadow-sm">
+          <div key={template.id} className="border rounded p-4 shadow-sm text-black">
             <h3 className="text-lg font-semibold">{template.title}</h3>
             <p className="text-sm text-gray-600 mb-2">{template.explanation}</p>
             <div className="text-sm text-blue-500">
@@ -94,19 +95,19 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
               </button>
               <button
                 onClick={() => onEdit(template)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-1 px-2 rounded"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
               >
                 Edit
               </button>
               <button
                 onClick={() => onFork(template)}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-2 rounded"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
               >
                 Fork
               </button>
               <button
                 onClick={() => handleDeleteTemplate(template.id)}
-                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
               >
                 Delete
               </button>

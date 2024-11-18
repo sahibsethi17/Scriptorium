@@ -3,8 +3,6 @@ import CodeEditor from './components/CodeEditor';
 import LanguageSelector from './components/LanguageSelector';
 import OutputDisplay from './components/OutputDisplay';
 import TemplateList from './components/Templatelist';
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import axios from 'axios';
 
 const App: React.FC = () => {
@@ -123,7 +121,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100 p-6">
-      <Navbar />
       <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center">Scriptorium Code Editor</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
@@ -158,7 +155,7 @@ const App: React.FC = () => {
           {/* Save Template Form */}
           {isSavingTemplate && (
             <div className="mt-4 p-4 border border-gray-300 rounded bg-white">
-              <h2 className="text-xl font-bold mb-4">Save as Template</h2>
+              <h2 className="text-xl font-bold mb-4 text-black">Save as Template</h2>
               <input
                 type="text"
                 placeholder="Title"
@@ -208,7 +205,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Right Section (Templates List) */}
-        <div>
+        <div className='margin-left-10'>
           <TemplateList
             refreshTrigger={refreshTrigger}
             onRun={handleRunTemplate}
@@ -231,7 +228,6 @@ const App: React.FC = () => {
           />
         </div>
       </div>
-      <Footer/>
     </div>
   );
 };

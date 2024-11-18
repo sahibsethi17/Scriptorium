@@ -205,7 +205,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Right Section (Templates List) */}
-        <div>
+       <div className='margin-left-10'>
           <TemplateList
             refreshTrigger={refreshTrigger}
             onRun={handleRunTemplate}

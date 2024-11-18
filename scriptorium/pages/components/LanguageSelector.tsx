@@ -12,11 +12,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ language, setLangua
     <select
       value={language}
       onChange={(e) => setLanguage(e.target.value)}
-      className="w-full p-3 border rounded border-gray-300"
+      className="w-full p-3 border rounded border-gray-300 text-black"
     >
       {languages.map((lang) => (
         <option key={lang} value={lang}>
-          {lang.toUpperCase()}
+          {lang}
         </option>
       ))}
     </select>
