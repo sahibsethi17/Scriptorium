@@ -99,6 +99,11 @@ button:hover {
   @apply mt-8 px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700;
 }
 
+/* Blog Styles */
+.search-input {
+  @apply text-black border border-gray-300 rounded-md p-2 w-full;
+}
+
 /* Fade and Slide Animation */
 @keyframes fadeSlideIn {
   0% {
