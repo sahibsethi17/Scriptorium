@@ -1,4 +1,4 @@
-/* GENERATED WITH CHATGPT */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -13,24 +13,23 @@
   --code-text: #1e1e1e; /* Light mode code text */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1a1a; /* Dark mode background */
-    --foreground: #e5e5e5; /* Dark mode text */
-    --primary: #60a5fa; /* Lighter blue in dark mode */
-    --code-bg: #272727; /* Dark mode code block background */
-    --code-text: #e0e0e0; /* Dark mode code text */
-  }
+.dark {
+  --background: #1a1a1a; /* Dark mode background */
+  --foreground: #e5e5e5; /* Dark mode text */
+  --primary: #60a5fa; /* Lighter blue in dark mode */
+  --code-bg: #272727; /* Dark mode code block background */
+  --code-text: #e0e0e0; /* Dark mode code text */
 }
 
 /* Global Styles */
 body {
+  background-color: var(--background);
   color: var(--foreground);
-  background: var(--background);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
   line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Code Block Styling */
@@ -53,11 +52,38 @@ button {
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
+/* Button Dynamic Hover Effects */
 button:hover {
-  background: #1d4ed8; /* Darker blue on hover */
+  background: linear-gradient(90deg, #1e40af, #22d3ee);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Dark Mode Specific Styles */
+.dark body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.dark pre, .dark code {
+  background: var(--code-bg);
+  color: var(--code-text);
+}
+
+/* Navbar Styling */
+nav {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark nav {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 /* Responsive Adjustments */
@@ -82,121 +108,16 @@ button:hover {
   }
 }
 
-/* Landing Page Styles */
-#landing-page {
-  @apply min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-b from-gray-200 to-gray-100;
+/* Animations */
+a, button {
+  transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
-#landing-title {
-  @apply text-4xl md:text-6xl font-bold text-gray-800;
+a:hover, button:hover {
+  transform: scale(1.1);
 }
 
-#landing-subtitle {
-  @apply text-lg md:text-xl text-gray-600 mt-4;
-}
-
-#landing-button {
-  @apply mt-8 px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700;
-}
-
-/* Blog Styles */
-.search-input {
-  @apply text-black border border-gray-300 rounded-md p-2 w-full;
-}
-
-/* Fade and Slide Animation */
-@keyframes fadeSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-fade-slide {
-  animation: fadeSlideIn 1.5s ease-in-out;
-}
-
-/* Fade and Slide-In Animations */
-@keyframes fadeSlideInLeft {
-  0% {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  0% {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Animation Classes */
-.animate-fade-slide-left {
-  animation: fadeSlideInLeft 1.5s ease-in-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 1.5s ease-in-out;
-}
-/* Keyframes for Animations */
-@keyframes fadeSlideInLeft {
-  0% {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  0% {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeSlideUp {
-  0% {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Animation Classes */
-.animate-fade-slide-left {
-  animation: fadeSlideInLeft 1.5s ease-in-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 1.5s ease-in-out;
-}
-
-.animate-fade-slide-up {
-  animation: fadeSlideUp 1.5s ease-in-out;
-}
-.margin-left-10 {
-  margin-left: 40px !important;
+img:hover {
+  transform: scale(1.05) rotate(2deg);
+  transition: transform 0.3s ease-in-out;
 }

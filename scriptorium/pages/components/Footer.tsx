@@ -1,23 +1,34 @@
-// pages/components/Footer.tsx
 import React from "react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white py-8">
+    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Left Section: Site Links */}
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 mb-4 md:mb-0">
-            <a href="/" className="hover:text-blue-400">
+            <a
+              href="/"
+              className="hover:text-blue-400 transition-colors duration-300 hover:underline"
+            >
               Home
             </a>
-            <a href="/about" className="hover:text-blue-400">
+            <a
+              href="/about"
+              className="hover:text-blue-400 transition-colors duration-300 hover:underline"
+            >
               About
             </a>
-            <a href="/contact" className="hover:text-blue-400">
+            <a
+              href="/contact"
+              className="hover:text-blue-400 transition-colors duration-300 hover:underline"
+            >
               Contact
             </a>
-            <a href="/privacy" className="hover:text-blue-400">
+            <a
+              href="/privacy"
+              className="hover:text-blue-400 transition-colors duration-300 hover:underline"
+            >
               Privacy Policy
             </a>
           </div>
@@ -29,7 +40,7 @@ const Footer: React.FC = () => {
               href="https://github.com/your-github"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-blue-400"
+              className="hover:scale-125 hover:text-blue-400 transition-transform duration-300"
             >
               <svg
                 className="w-6 h-6"
@@ -45,10 +56,15 @@ const Footer: React.FC = () => {
               </svg>
             </a>
 
-            {/* YouTube Icon (Button) */}
+            {/* YouTube Icon */}
             <button
-              onClick={() => window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}
-              className="hover:text-red-400"
+              onClick={() =>
+                window.open(
+                  "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                  "_blank"
+                )
+              }
+              className="hover:scale-125 hover:text-red-400 transition-transform duration-300"
             >
               <svg
                 className="w-6 h-6"
@@ -64,7 +80,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Right Section: Copyright */}
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-gray-400 hover:text-gray-200 transition-colors duration-300">
             &copy; {new Date().getFullYear()} Scriptorium. All rights reserved.
           </div>
         </div>
