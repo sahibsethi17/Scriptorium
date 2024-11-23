@@ -4,7 +4,7 @@ import { hashPassword, verifyAuth } from "../../../utils/auth";
 export default async function handler(req, res) {
   const { id } = req.query;
 
-  const userId = await verifyAuth(req);
+  const { userId } = await verifyAuth(req);
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized action" });
   }

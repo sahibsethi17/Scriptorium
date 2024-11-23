@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     }
 
     // Check if we have a logged in user
-    const userId = await verifyAuth(req);
+    const { userId } = await verifyAuth(req);
     let isAdmin = false;
     let currentUserId = null;
 

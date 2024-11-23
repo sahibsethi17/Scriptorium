@@ -63,12 +63,12 @@ const Blogs = () => {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
       <Navbar />
       <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center mt-4">
         Search Blogs
       </h1>
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 dark:bg-gray-600 dark:text-white">
         {/* Search Form */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <input
@@ -77,7 +77,7 @@ const Blogs = () => {
             value={searchParams.title}
             onChange={handleInputChange}
             placeholder="Blog Title"
-            className="search-input"
+            className="search-input rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
           />
           <input
             type="text"
@@ -85,7 +85,7 @@ const Blogs = () => {
             value={searchParams.description}
             onChange={handleInputChange}
             placeholder="Blog Description"
-            className="search-input"
+            className="search-input rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
           />
           <input
             type="text"
@@ -93,7 +93,7 @@ const Blogs = () => {
             value={searchParams.tags}
             onChange={handleInputChange}
             placeholder="Blog Tags (comma-separated)"
-            className="search-input"
+            className="search-input rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
           />
           <input
             type="text"
@@ -101,15 +101,15 @@ const Blogs = () => {
             value={searchParams.templateIds}
             onChange={handleInputChange}
             placeholder="Template IDs"
-            className="search-input md:col-span-3"
+            className="search-input md:col-span-3 rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
           />
           <div className="flex flex-col md:col-span-3">
-            <label className="text-black mb-2 font-medium">Order By:</label>
+            <label className="text-black mb-2 font-medium dark:text-white">Order By:</label>
             <select
               name="order"
               value={searchParams.order}
               onChange={handleInputChange}
-              className="search-input"
+              className="search-input rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
             >
               <option value="">None</option>
               <option value="upvotes">Upvotes</option>
@@ -128,17 +128,17 @@ const Blogs = () => {
             {blogs.map((blog: any) => (
               <div
                 key={blog.id}
-                className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg"
+                className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg dark:bg-gray-600 dark:text-white"
               >
-                <h2 className="text-xl font-bold text-gray-800">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
                   {blog.title}
                 </h2>
-                <p className="text-gray-600 mt-2">{blog.description}</p>
-                <div className="flex items-center justify-between text-sm text-gray-500 mt-4">
+                <p className="text-gray-600 mt-2 dark:text-white">{blog.description}</p>
+                <div className="flex items-center justify-between text-sm text-gray-500 mt-4 dark:text-gray-400">
                   <span>Upvotes: {blog.upvotes}</span>
                   <span>Downvotes: {blog.downvotes}</span>
                 </div>
-                <div className="text-sm text-gray-400 mt-2">
+                <div className="text-sm text-gray-400 mt-2 dark:text-gray-200">
                   Tags:
                   {Array.isArray(blog.tags)
                     ? blog.tags.join(", ")

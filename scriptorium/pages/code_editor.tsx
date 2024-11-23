@@ -4,6 +4,8 @@ import LanguageSelector from './components/LanguageSelector';
 import OutputDisplay from './components/OutputDisplay';
 import TemplateList from './components/Templatelist';
 import axios from 'axios';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState('python'); // Default language
@@ -120,7 +122,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 p-6">
+    <>
+    <Navbar />
+    <div className="min-h-screen flex flex-col bg-gray-100 p-6 dark:bg-gray-800 dark:text-white">
       <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center">Scriptorium Code Editor</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
@@ -132,7 +136,7 @@ const App: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Standard input (optional)"
-            className="w-full p-3 border rounded border-gray-300 mt-4"
+            className="w-full p-3 border rounded border-gray-300 bg-white mt-4 dark:bg-gray-900 dark:text-white"
             rows={3}
           />
           <div className="flex gap-4 mt-4">
@@ -229,6 +233,8 @@ const App: React.FC = () => {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

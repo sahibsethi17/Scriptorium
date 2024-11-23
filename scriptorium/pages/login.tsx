@@ -1,4 +1,3 @@
-// pages/login.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import Navbar from "./components/Navbar";
@@ -33,7 +32,6 @@ const Login: React.FC = () => {
 
       const accessToken = response.data?.accessToken;
       if (accessToken) {
-        console.log(response.data.userId);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("userId", response.data.userId);
 
@@ -42,7 +40,7 @@ const Login: React.FC = () => {
         // Dispatch custom event to notify the app of login status change
         window.dispatchEvent(new Event("loginStatusChange"));
 
-        // Redirect to the code editor Page (MAKE SURE TO UPDATE)
+        // Redirect to the home page
         router.push("/");
       } else {
         throw new Error("No access token received.");
@@ -57,9 +55,9 @@ const Login: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-black text-center mb-6">Log In</h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md dark:bg-gray-600 dark:text-white">
+          <h2 className="text-2xl font-bold text-black dark:text-white text-center mb-6">Log In</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -68,7 +66,7 @@ const Login: React.FC = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 text-black border rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -77,7 +75,7 @@ const Login: React.FC = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 text-black border rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <button

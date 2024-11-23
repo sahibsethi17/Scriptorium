@@ -26,6 +26,7 @@ export default async function handler(req, res) {
         where: { id: user.id },
         data: { refreshToken },
       });
+      console.log(refreshToken);
 
       // Set the refresh token cookie
       const refreshTokenCookie = serialize('refreshToken', refreshToken, {

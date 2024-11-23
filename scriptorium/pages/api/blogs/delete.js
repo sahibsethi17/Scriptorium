@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     }
 
     // Get the currently logged in user (if exists)
-    const userId = await verifyAuth(req);
+    const { userId } = await verifyAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     // Get the blog ID

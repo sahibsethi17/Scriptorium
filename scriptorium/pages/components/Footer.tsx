@@ -1,8 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Footer: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Check and apply the theme from localStorage or system preference
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === "dark");
+      document.documentElement.classList.toggle("dark", storedTheme === "dark");
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setIsDarkMode(prefersDark);
+      document.documentElement.classList.toggle("dark", prefersDark);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDarkMode ? "light" : "dark";
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
   return (
-    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-8">
+    <footer
+      className={`${
+        isDarkMode
+          ? "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white"
+          : "bg-white text-black"
+      } py-8 transition-colors duration-300`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
           {/* Left Section: Site Links */}
@@ -12,12 +40,6 @@ const Footer: React.FC = () => {
               className="hover:text-blue-400 transition-colors duration-300 hover:underline"
             >
               Home
-            </a>
-            <a
-              href="/about"
-              className="hover:text-blue-400 transition-colors duration-300 hover:underline"
-            >
-              About
             </a>
             <a
               href="/contact"
@@ -80,9 +102,18 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Right Section: Copyright */}
-          <div className="text-sm text-gray-400 hover:text-gray-200 transition-colors duration-300">
+          <div className="text-sm text-black hover:text-gray-200 transition-colors duration-300 dark:text-gray-400">
             &copy; {new Date().getFullYear()} Scriptorium. All rights reserved.
           </div>
+        </div>
+        {/* Theme Toggle Button */}
+        <div className="mt-4">
+          <button
+            onClick={toggleTheme}
+            className="p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded"
+          >
+            {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          </button>
         </div>
       </div>
     </footer>

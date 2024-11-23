@@ -82,36 +82,36 @@ export async function verifyAuth(req) {
 
     try {
       const user = jwt.verify(token, ACCESS_TOKEN_SECRET);
-      return user.userId;
+      return { userId: user.userId, accessToken: token };
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
           return { error: 'User is not logged in.', status: 401 };
         }
-
-        // Check if the refresh token is still valid in the database
-        const user = await prisma.user.findUnique({
-          where: { refreshToken },
-        });
-
-        if (!user) {
-          return { error: 'Refresh token is invalid or revoked.', status: 401 };
-        }
         
         if (isTokenExpired(refreshToken)) {
           try {
-            await axios.post('/api/logout');
-            return { error: 'Session expired. Please log in again.', status: 401 };
+            await axios.post('http://localhost:3000/pages/api/auth/logout');
+            return { userId: null, error: 'Session expired. Please log in again.', status: 401 };
           } catch (logoutError) {
             console.error('Logout failed:', logoutError);
             throw logoutError;
           }
         } else {
-          const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-          const payload = { userId: user.userId, username: user.username };
-          const newAccessToken = generateAccessToken(payload);
-          return { userId: user.userId, newAccessToken };
+            try {
+              const user = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+              if (!user) {
+                console.error("Invalid refresh token payload");
+                return { error: "Invalid refresh token payload.", status: 401 };
+              }
+              const payload = { userId: user.userId, username: user.username };
+              const newAccessToken = generateAccessToken(payload);
+              return { userId: user.userId, accessToken: newAccessToken };
+            } catch (error) {
+              console.error("Error verifying refresh token:", error);
+              return { error: "Refresh token verification failed.", status: 401 };
+            }
         }
       } else {
         console.error('Token verification error:', error);

@@ -43,9 +43,9 @@ const Signup: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-black text-center mb-6">Sign Up</h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
+        <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md dark:bg-gray-600 dark:text-white">
+          <h2 className="text-2xl font-bold text-black text-center mb-6 dark:text-white">Sign Up</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,7 +55,7 @@ const Signup: React.FC = () => {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -64,7 +64,7 @@ const Signup: React.FC = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -73,7 +73,7 @@ const Signup: React.FC = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -82,7 +82,7 @@ const Signup: React.FC = () => {
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -91,7 +91,7 @@ const Signup: React.FC = () => {
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
             <input
@@ -100,7 +100,7 @@ const Signup: React.FC = () => {
               placeholder="Phone Number"
               value={formData.phoneNumber}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
               required
             />
 

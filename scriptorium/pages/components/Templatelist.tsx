@@ -54,34 +54,34 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4 text-black">Templates</h2>
+      <h2 className="text-xl font-bold mb-4 text-black dark:text-white">Templates</h2>
       <div className="mb-4">
         <input
           type="text"
           value={searchTitle}
           onChange={(e) => setSearchTitle(e.target.value)}
           placeholder="Search by title"
-          className="w-full p-2 mb-2 border rounded border-gray-300 "
+          className="w-full p-2 mb-2 border rounded bg-white border-gray-300 dark:bg-gray-900 dark:text-white"
         />
         <input
           type="text"
           value={searchExplanation}
           onChange={(e) => setSearchExplanation(e.target.value)}
           placeholder="Search by explanation"
-          className="w-full p-2 mb-2 border rounded border-gray-300"
+          className="w-full p-2 mb-2 border rounded bg-white border-gray-300 dark:bg-gray-900 dark:text-white"
         />
         <input
           type="text"
           value={searchTags}
           onChange={(e) => setSearchTags(e.target.value)}
           placeholder="Search by tags"
-          className="w-full p-2 mb-2 border rounded border-gray-300"
+          className="w-full p-2 mb-2 border rounded bg-white border-gray-300 dark:bg-gray-900 dark:text-white"
         />
       </div>
       <div className="space-y-4">
         {filteredTemplates.map((template: any) => (
-          <div key={template.id} className="border rounded p-4 shadow-sm text-black">
-            <h3 className="text-lg font-semibold">{template.title}</h3>
+          <div key={template.id} className="border rounded p-4 shadow-sm bg-white text-black dark:bg-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold dark:text-white">{template.title}</h3>
             <p className="text-sm text-gray-600 mb-2">{template.explanation}</p>
             <div className="text-sm text-blue-500">
               Tags: {template.tags ? template.tags.split(',').join(', ') : 'None'}

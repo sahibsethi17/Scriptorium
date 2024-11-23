@@ -7,8 +7,8 @@ interface OutputDisplayProps {
 
 const OutputDisplay: React.FC<OutputDisplayProps> = ({ output, className }) => {
   return (
-    <div className={`p-3 border rounded border-gray-300 bg-white ${className || ''}`}>
-      <h2 className="text-xl font-semibold mb-2 text-black">Output:</h2>
+    <div className={`p-3 border rounded border-gray-300 bg-white ${className || ''} dark:bg-gray-900 dark:text-white`}>
+      <h2 className="text-xl font-semibold mb-2 text-black dark:bg-gray-900 dark:text-white">Output:</h2>
       <pre className="whitespace-pre-wrap">{output}</pre>
     </div>
   );

@@ -4,7 +4,7 @@ import { prisma } from "@/utils/db";
 import { convertToArray } from '@/utils/blog-utils'
 
 export default async function handler(req, res) {
-    const userId = await verifyAuth(req);
+    const { userId } = await verifyAuth(req);
     if (!userId) return res.status(401).json({ error: "Unauthorized action" });
 
     if (req.method === 'POST') {

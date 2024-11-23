@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
+import axiosInstance from "@/utils/axiosInstance";
 
 interface User {
   avatar: string;
@@ -13,7 +14,6 @@ const Navbar: React.FC = () => {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [user, setUser] = useState<User | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   // Fetch user data including the avatar
   useEffect(() => {
@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
 
       if (isLoggedIn && userId && accessToken) {
         try {
-          const response = await axios.get(`/api/users/${userId}`, {
+          const response = await axiosInstance.get(`/users/${userId}`, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
@@ -48,31 +48,6 @@ const Navbar: React.FC = () => {
     fetchUser();
   }, [isLoggedIn, setIsLoggedIn]);
 
-  // Handle theme toggle
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
-      setIsDarkMode(true);
-    } else {
-      document.documentElement.classList.remove("dark");
-      setIsDarkMode(false);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = isDarkMode ? "light" : "dark";
-    localStorage.setItem("theme", newTheme);
-
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    setIsDarkMode(!isDarkMode);
-  };
-
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -88,7 +63,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
+    <nav className="bg-background text-foreground px-6 py-4 flex justify-between items-center shadow-md dark:bg-gray-900 dark:text-white">
       <div
         className="text-2xl font-bold cursor-pointer hover:scale-110 transition-transform duration-300"
         onClick={() => router.push("/")}
@@ -96,14 +71,6 @@ const Navbar: React.FC = () => {
         Scriptorium
       </div>
       <div className="flex space-x-4 items-center">
-        {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          className="bg-gray-700 p-2 rounded-full text-white hover:bg-gray-600 transition"
-        >
-          {isDarkMode ? "🌙" : "☀️"}
-        </button>
-
         {isLoggedIn ? (
           <>
             <a

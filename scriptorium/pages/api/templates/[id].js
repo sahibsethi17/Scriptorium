@@ -4,7 +4,7 @@ import { verifyAuth } from "@/utils/auth";
 
 export default async function handler(req, res) {
   const { id } = req.query;
-  const userId = await verifyAuth(req);
+  const { userId } = await verifyAuth(req);
 
   if (req.method === 'GET') {
     // Retrieve template by ID

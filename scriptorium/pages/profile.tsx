@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useAuth } from "./components/AuthContext";
+import axiosInstance from "../utils/axiosInstance"; // Import the configured Axios instance
 
 const Profile: React.FC = () => {
   const router = useRouter();
@@ -42,7 +43,7 @@ const Profile: React.FC = () => {
           return;
         }
 
-        const response = await axios.get(`/api/users/${userId}`, {
+        const response = await axiosInstance.get(`/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -94,8 +95,8 @@ const Profile: React.FC = () => {
         return;
       }
 
-      await axios.put(
-        `/api/users/${userId}`,
+      await axiosInstance.put(
+        `/users/${userId}`,
         formData,
         {
           headers: {
@@ -128,7 +129,7 @@ const Profile: React.FC = () => {
 
       setIsLoggedIn(false);
 
-      await axios.delete(`/api/users/${userId}`, {
+      await axiosInstance.delete(`/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -154,8 +155,8 @@ const Profile: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12">
-        <div className="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12 dark:bg-gray-800 dark:text-white">
+        <div className="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md dark:bg-gray-600 dark:text-white">
           <h1 className="text-3xl font-bold mb-6">Edit Profile</h1>
           {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
           <form onSubmit={handleUpdate} className="space-y-4">
@@ -165,7 +166,7 @@ const Profile: React.FC = () => {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
             />
             <input
               type="email"
@@ -173,7 +174,7 @@ const Profile: React.FC = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
             />
             <input
               type="text"
@@ -181,7 +182,7 @@ const Profile: React.FC = () => {
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
             />
             <input
               type="text"
@@ -189,7 +190,7 @@ const Profile: React.FC = () => {
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
             />
             <input
               type="tel"
@@ -197,7 +198,7 @@ const Profile: React.FC = () => {
               placeholder="Phone Number"
               value={formData.phoneNumber}
               onChange={handleChange}
-              className="w-full p-3 border text-black rounded-lg"
+              className="w-full p-3 text-black bg-white border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-500"
             />
 
             <div className="flex space-x-4">
