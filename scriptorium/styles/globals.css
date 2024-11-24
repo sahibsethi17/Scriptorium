@@ -121,3 +121,7 @@ img:hover {
   transform: scale(1.05) rotate(2deg);
   transition: transform 0.3s ease-in-out;
 }
+
+.margin-left-200 {
+  margin-left: 40px;
+}

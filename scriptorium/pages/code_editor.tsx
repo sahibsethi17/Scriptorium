@@ -6,8 +6,10 @@ import TemplateList from './components/Templatelist';
 import axios from 'axios';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { useAuth } from './components/AuthContext'; // Import AuthContext
 
 const App: React.FC = () => {
+  const { isLoggedIn } = useAuth(); // Access authentication state
   const [language, setLanguage] = useState('python'); // Default language
   const [code, setCode] = useState('');
   const [input, setInput] = useState('');
@@ -46,7 +48,6 @@ const App: React.FC = () => {
     setCode(template.code);
     setLanguage(template.language);
     setInput('');
-    // setInput(template.stdin ? template.stdin.split('\n').join('\n') : '');
   };
 
   const handleForkTemplate = async (template: any) => {
@@ -123,117 +124,119 @@ const App: React.FC = () => {
 
   return (
     <>
-    <Navbar />
-    <div className="min-h-screen flex flex-col bg-gray-100 p-6 dark:bg-gray-800 dark:text-white">
-      <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center">Scriptorium Code Editor</h1>
+      <Navbar />
+      <div className="min-h-screen flex flex-col bg-gray-100 p-6 dark:bg-gray-800 dark:text-white">
+        <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center">Scriptorium Code Editor</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
-        {/* Left Section (Code Editor + Input + Buttons) */}
-        <div>
-          <LanguageSelector language={language} setLanguage={setLanguage} />
-          <CodeEditor code={code} setCode={setCode} language={language} />
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Standard input (optional)"
-            className="w-full p-3 border rounded border-gray-300 bg-white mt-4 dark:bg-gray-900 dark:text-white"
-            rows={3}
-          />
-          <div className="flex gap-4 mt-4">
-            <button
-              onClick={handleRunCode}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Running...' : 'Run Code'}
-            </button>
-            <button
-              onClick={() => setIsSavingTemplate(true)}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
-            >
-              Save as Template
-            </button>
-          </div>
-          <OutputDisplay output={output} className="mt-4" />
-
-          {/* Save Template Form */}
-          {isSavingTemplate && (
-            <div className="mt-4 p-4 border border-gray-300 rounded bg-white">
-              <h2 className="text-xl font-bold mb-4 text-black">Save as Template</h2>
-              <input
-                type="text"
-                placeholder="Title"
-                value={templateDetails.title}
-                onChange={(e) =>
-                  setTemplateDetails((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className="w-full p-2 border rounded mb-4"
-              />
-              <textarea
-                placeholder="Explanation"
-                value={templateDetails.explanation}
-                onChange={(e) =>
-                  setTemplateDetails((prev) => ({ ...prev, explanation: e.target.value }))
-                }
-                className="w-full p-2 border rounded mb-4"
-                rows={3}
-              />
-              <input
-                type="text"
-                placeholder="Tags (comma-separated)"
-                value={templateDetails.tags}
-                onChange={(e) =>
-                  setTemplateDetails((prev) => ({ ...prev, tags: e.target.value }))
-                }
-                className="w-full p-2 border rounded mb-4"
-              />
-              <div className="flex gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
+          {/* Left Section (Code Editor + Input + Buttons) */}
+          <div>
+            <LanguageSelector language={language} setLanguage={setLanguage} />
+            <CodeEditor code={code} setCode={setCode} language={language} />
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Standard input (optional)"
+              className="w-full p-3 border rounded border-gray-300 bg-white mt-4 dark:bg-gray-900 dark:text-white"
+              rows={3}
+            />
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={handleRunCode}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Running...' : 'Run Code'}
+              </button>
+              {isLoggedIn && ( // Show "Save as Template" only for authenticated users
                 <button
-                  onClick={handleSaveTemplate}
-                  className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
+                  onClick={() => setIsSavingTemplate(true)}
+                  className="bg-blue-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
                 >
-                  Save Template
+                  Save as Template
                 </button>
-                <button
-                  onClick={() => {
-                    setIsSavingTemplate(false);
-                    setEditingTemplateId(null); // Reset editing state
-                  }}
-                  className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
+              )}
             </div>
-          )}
-        </div>
+            <OutputDisplay output={output} className="mt-4" />
 
-        {/* Right Section (Templates List) */}
-        <div className='margin-left-10'>
-          <TemplateList
-            refreshTrigger={refreshTrigger}
-            onRun={handleRunTemplate}
-            onEdit={(template) => {
-              console.log('Editing template:', template);
-              setCode(template.code);
-              setLanguage(template.language);
-              setInput(template.stdin ? template.stdin.split('\n').join('\n') : '');
-              setTemplateDetails({
-                title: template.title,
-                explanation: template.explanation,
-                tags: template.tags,
-              });
-              setEditingTemplateId(template.id);
-              setIsSavingTemplate(true);
-            }}
-            onFork={(template) => {
-              handleForkTemplate(template);
-            }}
-          />
+            {/* Save Template Form */}
+            {isSavingTemplate && (
+              <div className="mt-4 p-4 border border-gray-300 rounded bg-white">
+                <h2 className="text-xl font-bold mb-4 text-black">Save as Template</h2>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={templateDetails.title}
+                  onChange={(e) =>
+                    setTemplateDetails((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  className="w-full p-2 border rounded mb-4"
+                />
+                <textarea
+                  placeholder="Explanation"
+                  value={templateDetails.explanation}
+                  onChange={(e) =>
+                    setTemplateDetails((prev) => ({ ...prev, explanation: e.target.value }))
+                  }
+                  className="w-full p-2 border rounded mb-4"
+                  rows={3}
+                />
+                <input
+                  type="text"
+                  placeholder="Tags (comma-separated)"
+                  value={templateDetails.tags}
+                  onChange={(e) =>
+                    setTemplateDetails((prev) => ({ ...prev, tags: e.target.value }))
+                  }
+                  className="w-full p-2 border rounded mb-4"
+                />
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleSaveTemplate}
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Save Template
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsSavingTemplate(false);
+                      setEditingTemplateId(null); // Reset editing state
+                    }}
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Section (Templates List) */}
+          <div className='margin-left-200'>
+            <TemplateList
+              refreshTrigger={refreshTrigger}
+              onRun={handleRunTemplate}
+              onEdit={(template) => {
+                console.log('Editing template:', template);
+                setCode(template.code);
+                setLanguage(template.language);
+                setInput(template.stdin ? template.stdin.split('\n').join('\n') : '');
+                setTemplateDetails({
+                  title: template.title,
+                  explanation: template.explanation,
+                  tags: template.tags,
+                });
+                setEditingTemplateId(template.id);
+                setIsSavingTemplate(true);
+              }}
+              onFork={(template) => {
+                handleForkTemplate(template);
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
   );
 };
