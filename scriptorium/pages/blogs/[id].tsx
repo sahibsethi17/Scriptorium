@@ -195,7 +195,9 @@ const BlogPage = () => {
           <div className="mt-6 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div
-                className="flex items-center cursor-pointer transition-all duration-300 hover:bg-green-100 p-2 rounded-md"
+                className={`flex items-center cursor-pointer transition-all duration-300 p-2 rounded-md ${
+                  blogPost.userUpvoted ? "bg-green-100" : "hover:bg-green-100"
+                }`}
                 onClick={handleUpvote}
               >
                 <img
@@ -209,7 +211,8 @@ const BlogPage = () => {
               </div>
 
               <div
-                className="flex items-center cursor-pointer transition-all duration-300 hover:bg-red-100 p-2 rounded-md"
+                className={`flex items-center cursor-pointer transition-all duration-300 p-2 rounded-md ${
+                  blogPost.userDownvoted ? "bg-red-100" : "hover:bg-red-100"}`}
                 onClick={handleDownvote}
               >
                 <img
