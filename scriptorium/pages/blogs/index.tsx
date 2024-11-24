@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Pagination from "pages/components/Pagination";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -126,27 +126,31 @@ const Blogs = () => {
         {blogs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {blogs.map((blog: any) => (
-              <div
+              <button
                 key={blog.id}
-                className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg dark:bg-gray-600 dark:text-white"
+                className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg dark:bg-gray-600 dark:text-white hover:scale-105 hover:shadow-blue-400/50 transition duration-300 ease-in-out"
+                onClick={() => window.location.href = `/blogs/${blog.id}`}
               >
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
                   {blog.title}
                 </h2>
                 <p className="text-gray-600 mt-2 dark:text-white">{blog.description}</p>
                 <div className="flex items-center justify-between text-sm text-gray-500 mt-4 dark:text-gray-400">
-                  <span>Upvotes: {blog.upvotes}</span>
-                  <span>Downvotes: {blog.downvotes}</span>
+                  <span className="text-black dark:text-white">Upvotes: {blog.upvotes}</span>
+                  <span className="text-black dark:text-white">Downvotes: {blog.downvotes}</span>
                 </div>
                 <div className="text-sm text-gray-400 mt-2 dark:text-gray-200">
-                  Tags:
-                  {Array.isArray(blog.tags)
-                    ? blog.tags.join(", ")
-                    : blog.tags
-                    ? blog.tags
-                    : "No tags"}
+                  Tags: 
+                  {blog.tags.split(',').map((tag, index) => (
+            <span
+              key={index}
+              className="px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded-full m-0.5"
+            >
+              {tag.trim()}
+            </span>
+))}
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         ) : (

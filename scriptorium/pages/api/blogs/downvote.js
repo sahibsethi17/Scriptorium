@@ -28,7 +28,10 @@ export default async function handler(req, res) {
         if (diff === 1) {
             if (existingVote) {
                 if (existingVote.type === "DOWNVOTE") {
-                    return res.status(409).json({ error: "You have already downvoted this blog post." });
+                    const updatedBlog = await prisma.blog.findUnique({
+                        where: { id: Number(id) }
+                    });
+                    return res.status(200).json(updatedBlog);
                 } else if (existingVote.type === "UPVOTE") {
                     // Decrement upvotes by 1
                     await prisma.blog.update({

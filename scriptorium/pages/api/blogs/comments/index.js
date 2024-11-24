@@ -79,8 +79,16 @@ export default async function handler(req, res) {
             orderBy: orderBy,
             where: filter
         });
-        if (pageNum) comments = paginate(comments, pageNum);
-        return res.status(200).json(comments);
+        
+        // Pagination handling
+        const page = pageNum ? parseInt(pageNum) : 1;
+        const paginatedComments = paginate(comments, page);
+        
+        return res.status(200).json({
+            comments: paginatedComments.items,   
+            totalPages: paginatedComments.totalPages,  
+            totalItems: paginatedComments.totalItems,  
+        });
     } catch(err) {
         console.log(err);
         return res.status(500).json({ error: "Internal server error" });

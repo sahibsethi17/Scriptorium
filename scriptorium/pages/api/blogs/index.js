@@ -20,12 +20,17 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: "Internal server error" });
         }
     } else { // If at least one parameter is provided
-        const { id, title, description, tags, order, templateIds, pageNum } = req.query;
+        const { id, userId, title, description, tags, order, templateIds, pageNum } = req.query;
 
         let filter = { AND: [] };
         if (id) {
             filter.id = {
                 in: [Number(id)]
+            }
+        }
+        if (userId) {
+            filter.userId = {
+                in: [Number(userId)]
             }
         }
         if (title) {
@@ -73,7 +78,29 @@ export default async function handler(req, res) {
             // Pagination handling
             const page = pageNum ? parseInt(pageNum) : 1;
             const paginatedBlogs = paginate(blogsQuery, page);
-        
+
+            const auth = await verifyAuth(req);
+            if (auth) {
+                const { userId } = auth;
+                if (userId) {
+                    const existingVote = await prisma.blogVote.findUnique({
+                        where: {
+                            userId_blogId: { userId: Number(userId), blogId: Number(id) },
+                        }
+                    });
+                    if (existingVote) {
+                        console.log(existingVote.type);
+                        if (existingVote.type === 'UPVOTE') {
+                            paginatedBlogs.items[0].userUpvoted = true;
+                            paginatedBlogs.items[0].userDownvoted = false;
+                        } else if (existingVote.type === 'DOWNVOTE') {
+                            paginatedBlogs.items[0].userUpvoted = false
+                            paginatedBlogs.items[0].userDownvoted = true;
+                        }
+                    }
+                }
+            }
+            
             return res.status(200).json({
                 blogs: paginatedBlogs.items,   
                 totalPages: paginatedBlogs.totalPages,  
