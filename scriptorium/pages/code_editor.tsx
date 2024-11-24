@@ -53,7 +53,7 @@ const App: React.FC = () => {
   const handleForkTemplate = async (template: any) => {
     try {
       const payload = {
-        userId: 1, // Default user ID
+        userId: localStorage.getItem("userId"), // Default user ID
         title: `${template.title} (Forked)`,
         explanation: template.explanation,
         tags: template.tags || '',
@@ -63,9 +63,13 @@ const App: React.FC = () => {
         forkedFrom: template.id, // Add the forkedFrom field
       };
 
-      console.log('Forking template with payload:', payload);
-
-      const response = await axios.post('/api/templates/create', payload);
+     console.log('Forking template with payload:', payload);
+     const accessToken = localStorage.getItem('accessToken');
+     const response = await axios.post('/api/templates/create', payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
       if (response.status === 201) {
         setRefreshTrigger((prev) => prev + 1); // Refresh templates
@@ -86,7 +90,7 @@ const App: React.FC = () => {
 
     try {
       const payload = {
-        userId: 1, // Default user ID
+        userId: localStorage.getItem("userId"), // Default user ID
         title: templateDetails.title.trim(),
         explanation: templateDetails.explanation.trim(),
         tags: templateDetails.tags.trim() || '',
@@ -100,12 +104,29 @@ const App: React.FC = () => {
 
       let response;
 
+      // Get the access token from localStorage
+      const accessToken = localStorage.getItem('accessToken');
+
+      // Check if the access token is available
+      if (!accessToken) {
+        alert('You must be logged in to perform this action.');
+        return;
+      }
+
       if (editingTemplateId) {
         // Editing an existing template
-        response = await axios.put(`/api/templates/${editingTemplateId}`, payload);
+        response = await axios.put(`/api/templates/${editingTemplateId}`, payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       } else {
         // Creating a new template
-        response = await axios.post('/api/templates/create', payload);
+        response = await axios.post('/api/templates/create', payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       }
 
       if (response.status === 200 || response.status === 201) {

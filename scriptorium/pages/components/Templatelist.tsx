@@ -10,27 +10,57 @@ interface TemplateListProps {
 
 const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEdit, onFork }) => {
   const [templates, setTemplates] = useState([]);
+  const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null); // Store logged-in user's ID
+  const [currentPage, setCurrentPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages
   const [searchTitle, setSearchTitle] = useState('');
   const [searchExplanation, setSearchExplanation] = useState('');
   const [searchTags, setSearchTags] = useState('');
+  const itemsPerPage = 5; // Number of templates per page
 
   useEffect(() => {
+    // Fetch templates with pagination
     const fetchTemplates = async () => {
       try {
-        const response = await axios.get('/api/templates');
-        console.log(response);
+        const response = await axios.get('/api/templates', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          params: {
+            page: currentPage,
+            limit: itemsPerPage,
+          },
+        });
         setTemplates(response.data.templates);
+        setTotalPages(response.data.totalPages); // Set the total number of pages
       } catch (error) {
         console.error('Error fetching templates:', error);
       }
     };
 
+    // Fetch logged-in user's ID
+    const fetchUserId = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          setLoggedInUserId(parseInt(userId, 10));
+        }
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+      }
+    };
+
     fetchTemplates();
-  }, [refreshTrigger]);
+    fetchUserId();
+  }, [refreshTrigger, currentPage]);
 
   const handleDeleteTemplate = async (templateId: number) => {
     try {
-      await axios.delete(`/api/templates/${templateId}`);
+      await axios.delete(`/api/templates/${templateId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
       setTemplates((prevTemplates) =>
         prevTemplates.filter((template: any) => template.id !== templateId)
       );
@@ -51,6 +81,18 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
 
     return titleMatch && explanationMatch && tagsMatch;
   });
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <div>
@@ -80,12 +122,20 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
       </div>
       <div className="space-y-4">
         {filteredTemplates.map((template: any) => (
-          <div key={template.id} className="border rounded p-4 shadow-sm bg-white text-black dark:bg-gray-900 dark:text-white">
+          <div
+            key={template.id}
+            className="border rounded p-4 shadow-sm bg-white text-black dark:bg-gray-900 dark:text-white"
+          >
             <h3 className="text-lg font-semibold dark:text-white">{template.title}</h3>
             <p className="text-sm text-gray-600 mb-2">{template.explanation}</p>
             <div className="text-sm text-blue-500">
               Tags: {template.tags ? template.tags.split(',').join(', ') : 'None'}
             </div>
+            {loggedInUserId === template.userId && (
+              <span className="block bg-green-400 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mt-2">
+                Created by You
+              </span>
+            )}
             <div className="flex gap-2 mt-2">
               <button
                 onClick={() => onRun(template)}
@@ -114,6 +164,25 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
             </div>
           </div>
         ))}
+      </div>
+      <div className="flex justify-between items-center mt-4">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="bg-gray-300 hover:bg-gray-400 text-black py-1 px-3 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+          className="bg-gray-300 hover:bg-gray-400 text-black py-1 px-3 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
