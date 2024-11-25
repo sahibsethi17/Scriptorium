@@ -79,6 +79,17 @@ export default async function handler(req, res) {
             const page = pageNum ? parseInt(pageNum) : 1;
             const paginatedBlogs = paginate(blogsQuery, page);
 
+            // Get the username of the user that created this blog
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: paginatedBlogs.items[0].userId
+                }
+            })
+
+            // set username and avatar
+            paginatedBlogs.items[0].username = user.username;
+            paginatedBlogs.items[0].avatar = user.avatar;
+
             const auth = await verifyAuth(req);
             if (auth) {
                 const { userId } = auth;
@@ -89,7 +100,6 @@ export default async function handler(req, res) {
                         }
                     });
                     if (existingVote) {
-                        console.log(existingVote.type);
                         if (existingVote.type === 'UPVOTE') {
                             paginatedBlogs.items[0].userUpvoted = true;
                             paginatedBlogs.items[0].userDownvoted = false;
