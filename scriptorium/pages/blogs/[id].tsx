@@ -48,6 +48,7 @@ const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [accessToken, setAccessToken] = useState("");
   const [commentContent, setCommentContent] = useState("");
+  const [loggedInUserId, setLoggedInUserId] = useState(""); 
 
   const fetchBlogPost = async () => {
     try {
@@ -85,6 +86,35 @@ const BlogPage = () => {
     setCurrentPage(page);
     fetchComments(page);
   };
+
+  const handleBlogEdit = async () => {
+    window.location.href = `./edit/${blogPost.id}`;
+  }
+
+  const handleBlogDelete = async () => {
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return;
+    }
+  
+    try {
+      await fetch(`/api/blogs/delete`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        method: "DELETE",
+        body: JSON.stringify({
+          id: Number(id), // Ensure that id is part of the body
+        }),
+      });
+      alert("Blog deleted successfully");
+      window.location.href = `/blogs`; // Redirect to the updated blog page
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+      alert("Failed to edelete blog. Please try again.");
+    }
+  }
 
   const handleBlogUpvote = async () => {
     try {
@@ -214,6 +244,7 @@ const BlogPage = () => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("accessToken");
       setAccessToken(token);
+      setLoggedInUserId(localStorage.getItem("userId"));
     }
   }, [id]);
 
@@ -280,6 +311,10 @@ const BlogPage = () => {
                 onUpvote={handleBlogUpvote}
                 onDownvote={handleBlogDownvote}
               />
+            </div>
+            <div>
+              {blogPost.userId === Number(loggedInUserId) ? <button onClick={handleBlogEdit} className="mr-1.5">Edit</button> : ""}
+              {blogPost.userId === Number(loggedInUserId) ? <button onClick={handleBlogDelete} className="ml-1.5 bg-red-600">Delete</button> : ""}
             </div>
           </div>
         </div>

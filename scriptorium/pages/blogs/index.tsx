@@ -68,7 +68,7 @@ const Blogs = () => {
       <div className="flex items-center justify-between max-w-4xl mx-auto mt-4 mb-4">
         <button
           onClick={() => (window.location.href = "/blogs/create")}
-          className="py-2 px-4 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition ml-4 text-sm sm:text-base sm:py-2 sm:px-4 md:text-base md:py-3 md:px-6"
+          className="py-2 px-4 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition text-sm sm:text-base sm:py-2 sm:px-4 md:text-base md:py-3 md:px-6"
         >
           Create New Blog
         </button>

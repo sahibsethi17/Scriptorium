@@ -80,6 +80,13 @@ export default async function handler(req, res) {
             const paginatedBlogs = paginate(blogsQuery, page);
 
             // Get the username of the user that created this blog
+            if (!paginatedBlogs.items[0]) {
+                return res.status(200).json({
+                    blogs: [],   
+                    totalPages: 0, 
+                    totalItems: 0  
+                });
+            }
             const user = await prisma.user.findUnique({
                 where: {
                     id: paginatedBlogs.items[0].userId

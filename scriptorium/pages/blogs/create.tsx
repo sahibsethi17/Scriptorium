@@ -49,7 +49,6 @@ const CreateBlog = () => {
         Create a New Blog
       </h1>
       <BlogForm onSubmit={handleSubmit}/>
-      <Footer />
     </div>
   );
 };
