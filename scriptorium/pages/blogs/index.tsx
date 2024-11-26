@@ -65,9 +65,18 @@ const Blogs = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
       <Navbar />
-      <h1 className="text-3xl font-bold mb-6 text-blue-600 text-center mt-4">
-        Search Blogs
-      </h1>
+      <div className="flex items-center justify-between max-w-4xl mx-auto mt-4 mb-4">
+        <button
+          onClick={() => (window.location.href = "/blogs/create")}
+          className="py-2 px-4 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition ml-4 text-sm sm:text-base sm:py-2 sm:px-4 md:text-base md:py-3 md:px-6"
+        >
+          Create New Blog
+        </button>
+        <h1 className="pr-44 text-3xl font-bold text-blue-600 flex-1 text-center">
+          Search Blogs
+        </h1>
+      </div>
+
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 dark:bg-gray-600 dark:text-white">
         {/* Search Form */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -104,7 +113,9 @@ const Blogs = () => {
             className="search-input md:col-span-3 rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
           />
           <div className="flex flex-col md:col-span-3">
-            <label className="text-black mb-2 font-medium dark:text-white">Order By:</label>
+            <label className="text-black mb-2 font-medium dark:text-white">
+              Order By:
+            </label>
             <select
               name="order"
               value={searchParams.order}
@@ -129,26 +140,32 @@ const Blogs = () => {
               <button
                 key={blog.id}
                 className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg dark:bg-gray-600 dark:text-white hover:scale-105 hover:shadow-blue-400/50 transition duration-300 ease-in-out"
-                onClick={() => window.location.href = `/blogs/${blog.id}`}
+                onClick={() => (window.location.href = `/blogs/${blog.id}`)}
               >
                 <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
                   {blog.title}
                 </h2>
-                <p className="text-gray-600 mt-2 dark:text-white">{blog.description}</p>
+                <p className="text-gray-600 mt-2 dark:text-white">
+                  {blog.description}
+                </p>
                 <div className="flex items-center justify-between text-sm text-gray-500 mt-4 dark:text-gray-400">
-                  <span className="text-black dark:text-white">Upvotes: {blog.upvotes}</span>
-                  <span className="text-black dark:text-white">Downvotes: {blog.downvotes}</span>
+                  <span className="text-black dark:text-white">
+                    Upvotes: {blog.upvotes}
+                  </span>
+                  <span className="text-black dark:text-white">
+                    Downvotes: {blog.downvotes}
+                  </span>
                 </div>
                 <div className="text-sm text-gray-400 mt-2 dark:text-gray-200">
-                  Tags: 
-                  {blog.tags.split(',').map((tag, index) => (
-            <span
-              key={index}
-              className="px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded-full m-0.5"
-            >
-              {tag.trim()}
-            </span>
-))}
+                  Tags:
+                  {blog.tags.split(",").map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded-full m-0.5"
+                    >
+                      {tag.trim()}
+                    </span>
+                  ))}
                 </div>
               </button>
             ))}
