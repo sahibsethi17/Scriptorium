@@ -739,6 +739,7 @@ const BlogPage = () => {
                 >
                   Post Reply
                 </button>
+                
               </div>
             )}
             {renderReplies(reply.replies, reply.id)}
@@ -1235,8 +1236,8 @@ const BlogPage = () => {
             />
           </div>
         </div>
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 };
