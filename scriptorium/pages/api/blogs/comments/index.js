@@ -89,12 +89,34 @@ export default async function handler(req, res) {
     const page = pageNum ? parseInt(pageNum) : 1;
     const paginatedComments = paginate(comments, page);
 
+    console.log(userId)
+    if (userId) {
+      for (let i = 0; i < paginatedComments.items.length; i++) {
+        const existingVote = await prisma.commentVote.findUnique({
+          where: {
+            userId_commentId: {
+              userId: Number(userId),
+              commentId: Number(paginatedComments.items[i].id),
+            },
+          },
+        });
+        if (existingVote) {
+          if (existingVote.type === "UPVOTE") {
+            paginatedComments.items[i].userUpvoted = true;
+            paginatedComments.items[i].userDownvoted = false;
+          } else if (existingVote.type === "DOWNVOTE") {
+            paginatedComments.items[i].userUpvoted = false;
+            paginatedComments.items[i].userDownvoted = true;
+          }
+        }
+      }
+    }
+
     return res.status(200).json({
       comments: paginatedComments.items,
       totalPages: paginatedComments.totalPages,
       totalItems: paginatedComments.totalItems,
     });
-    
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });

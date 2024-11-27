@@ -142,10 +142,10 @@ const Blogs = () => {
                 className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg dark:bg-gray-600 dark:text-white hover:scale-105 hover:shadow-blue-400/50 transition duration-300 ease-in-out"
                 onClick={() => (window.location.href = `/blogs/${blog.id}`)}
               >
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 break-words">
                   {blog.title}
                 </h2>
-                <p className="text-gray-600 mt-2 dark:text-white">
+                <p className="text-gray-600 mt-2 dark:text-white break-words">
                   {blog.description}
                 </p>
                 <div className="flex items-center justify-between text-sm text-gray-500 mt-4 dark:text-gray-400">

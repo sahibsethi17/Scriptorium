@@ -25,7 +25,6 @@ const BlogForm: React.FC<BlogFormProps> = ({
   // GENERATED WITH CHATGPT
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 dark:bg-gray-600 dark:text-white mb-6">
-      <h2 className="text-2xl font-bold text-center mb-6 dark:text-white">Blog Form</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-lg font-medium dark:text-white" htmlFor="title">

@@ -1,3 +1,5 @@
+// MODIFIED FROM CHATGPT
+
 import { useAuth } from "pages/components/AuthContext";
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";

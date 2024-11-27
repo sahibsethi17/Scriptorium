@@ -1,3 +1,5 @@
+// MODIFED FROM CHATGPT
+
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
@@ -34,6 +36,8 @@ interface Comment {
   parentId: number | null;
   blogId: number;
   hidden: boolean;
+  userUpvoted: boolean;
+  userDownvoted: boolean;
 }
 
 const BlogPage = () => {
@@ -48,7 +52,7 @@ const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [accessToken, setAccessToken] = useState("");
   const [commentContent, setCommentContent] = useState("");
-  const [loggedInUserId, setLoggedInUserId] = useState(""); 
+  const [loggedInUserId, setLoggedInUserId] = useState("");
 
   const fetchBlogPost = async () => {
     try {
@@ -66,8 +70,9 @@ const BlogPage = () => {
 
   const fetchComments = async (page: number = 1) => {
     try {
+      console.log(commentsOrder)
       const response = await fetch(
-        `/api/blogs/comments/?blogId=${id}&pageNum=${page}`,
+        `/api/blogs/comments/?blogId=${id}&pageNum=${page}&order=${commentsOrder}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -89,14 +94,13 @@ const BlogPage = () => {
 
   const handleBlogEdit = async () => {
     window.location.href = `./edit/${blogPost.id}`;
-  }
+  };
 
   const handleBlogDelete = async () => {
-    if (!isLoggedIn) {
-      window.location.href = "/login";
+    if (!confirm("Are you sure you want to delete this blog?")) {
       return;
     }
-  
+
     try {
       await fetch(`/api/blogs/delete`, {
         headers: {
@@ -108,13 +112,13 @@ const BlogPage = () => {
           id: Number(id), // Ensure that id is part of the body
         }),
       });
-      alert("Blog deleted successfully");
+      alert("Blog deleted successfully!");
       window.location.href = `/blogs`; // Redirect to the updated blog page
     } catch (error) {
       console.error("Error deleting blog:", error);
       alert("Failed to edelete blog. Please try again.");
     }
-  }
+  };
 
   const handleBlogUpvote = async () => {
     try {
@@ -205,36 +209,52 @@ const BlogPage = () => {
         window.location.href = "/login";
         return;
       }
-      let diff = blogPost.userUpvoted ? -1 : 1;
-      const upvote = await fetch(`/api/blogs/upvote`, {
+
+      const comment = comments.find((c) => c.id === commentId);
+
+      let diff = comment.userUpvoted ? -1 : 1; // Toggle the upvote
+      await fetch(`/api/blogs/comments/upvote`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify({ id: blogPost.id, diff }),
+        body: JSON.stringify({ id: commentId, diff }),
       });
-      if (!upvote.ok) {
-        const errorText = await upvote.text(); // Get the raw response text
-        throw new Error(
-          `HTTP error! Status: ${upvote.status}, Message: ${errorText}`
-        );
+
+      // Refresh comments to reflect the update
+      await fetchComments(currentPage);
+    } catch (err) {
+      setError(`Error upvoting comment: ${err}`);
+    }
+  };
+
+  const handleCommentDownvote = async (commentId: number) => {
+    try {
+      if (!isLoggedIn) {
+        window.location.href = "/login";
+        return;
       }
-      const response = await fetch(`/api/blogs/?id=${id}`, {
+
+      const comment = comments.find((c) => c.id === commentId);
+      if (!comment) throw new Error("Comment not found");
+
+      let diff = comment.userDownvoted ? -1 : 1; // Toggle the downvote
+      await fetch(`/api/blogs/comments/downvote`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
+        method: "POST",
+        body: JSON.stringify({ id: commentId, diff }),
       });
-      const data = await response.json();
-      setBlog(data.blogs[0]);
+
+      // Refresh comments to reflect the update
+      await fetchComments(currentPage);
     } catch (err) {
-      setError(`Error upvoting: ${err}`);
+      setError(`Error downvoting comment: ${err}`);
     }
-  }
-
-  // const handleCommentDownvote = async (commentId: number) => {
-
-  // }
+  };
 
   useEffect(() => {
     if (id) {
@@ -246,7 +266,7 @@ const BlogPage = () => {
       setAccessToken(token);
       setLoggedInUserId(localStorage.getItem("userId"));
     }
-  }, [id]);
+  }, [id, commentsOrder]);
 
   if (error) {
     return <div className="text-red-500">Error: {error}</div>;
@@ -263,7 +283,7 @@ const BlogPage = () => {
       <div className="flex flex-col items-center">
         <div className="text-left w-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg border border-gray-200 mt-8 dark:bg-gray-600">
           <span className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 break-words">
               {blogPost.title}
             </h2>
             <div>
@@ -283,7 +303,7 @@ const BlogPage = () => {
             </div>
           </span>
 
-          <p className="mt-2 text-gray-600 dark:text-white text-1xl">
+          <p className="mt-2 text-gray-600 dark:text-white text-1xl break-words">
             {blogPost.description}
           </p>
 
@@ -313,8 +333,23 @@ const BlogPage = () => {
               />
             </div>
             <div>
-              {blogPost.userId === Number(loggedInUserId) ? <button onClick={handleBlogEdit} className="mr-1.5">Edit</button> : ""}
-              {blogPost.userId === Number(loggedInUserId) ? <button onClick={handleBlogDelete} className="ml-1.5 bg-red-600">Delete</button> : ""}
+              {blogPost.userId === Number(loggedInUserId) ? (
+                <button onClick={handleBlogEdit} className="mr-1.5">
+                  Edit
+                </button>
+              ) : (
+                ""
+              )}
+              {blogPost.userId === Number(loggedInUserId) ? (
+                <button
+                  onClick={handleBlogDelete}
+                  className="ml-1.5 bg-red-600"
+                >
+                  Delete
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
@@ -342,6 +377,21 @@ const BlogPage = () => {
               Post Comment
             </button>
             {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
+            <div className="flex flex-col md:col-span-3 mt-4">
+              <label className="text-gray-800 mb-2 font-medium dark:text-gray-200">
+                Order By:
+              </label>
+              <select
+                name="order"
+                value={commentsOrder}
+                onChange={(e) => setCommentsOrder(e.target.value)} // Uncomment to handle changes
+                className="w-full p-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm text-gray-800 dark:bg-gray-700 dark:border-gray-500 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition ease-in-out duration-200"
+              >
+                <option value="">None</option>
+                <option value="upvotes">Upvotes</option>
+                <option value="downvotes">Downvotes</option>
+              </select>
+            </div>
           </div>
 
           {/* Display Comments */}
@@ -374,6 +424,16 @@ const BlogPage = () => {
                         {comment.content}
                       </p>
                     </div>
+
+                    {/* Comment Ratings */}
+                    <Rating
+                      upvotes={comment.upvotes}
+                      downvotes={comment.downvotes}
+                      userUpvoted={comment.userUpvoted}
+                      userDownvoted={comment.userDownvoted}
+                      onUpvote={() => handleCommentUpvote(comment.id)}
+                      onDownvote={() => handleCommentDownvote(comment.id)}
+                    />
                   </li>
                 ))}
               </ul>
