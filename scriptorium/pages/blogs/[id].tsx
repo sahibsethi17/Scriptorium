@@ -114,7 +114,7 @@ const BlogPage = () => {
     }
   };
 
-  const handleCreateReply = async (parentId: number, replyContent: string) => {
+  const handleCreateReply = async (parentId: number, replyId: number, replyContent: string) => {
     try {
       await fetch(`/api/blogs/comments/create`, {
         headers: {
@@ -130,6 +130,9 @@ const BlogPage = () => {
       });
       setReplyContent((prev) => ({ ...prev, [parentId]: "" })); // Clear reply input
       setShowReplyInput((prev) => ({ ...prev, [parentId]: false })); // Hide reply input
+      if (replyId) {
+        setShowReplyInput((prev) => ({ ...prev, [replyId]: false })); // Hide reply input
+      }
       await fetchComments(currentPage);
     } catch (err) {
       setError(`Error replying: ${err}`);
@@ -385,7 +388,7 @@ const BlogPage = () => {
                 />
                 <button
                   onClick={() =>
-                    handleCreateReply(reply.id, replyContent[reply.id])
+                    handleCreateReply(parentId, reply.id, replyContent[reply.id])
                   }
                   disabled={!replyContent[reply.id]?.trim()}
                   className="mt-2 py-1 px-4 bg-blue-500 text-white rounded-md"
@@ -580,6 +583,7 @@ const BlogPage = () => {
                         onClick={() =>
                           handleCreateReply(
                             comment.id,
+                            null,
                             replyContent[comment.id]
                           )
                         }
