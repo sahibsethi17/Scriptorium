@@ -12,8 +12,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ code, setCode, language }) => {
   return (
     <div className="w-full mb-4">
       <MonacoEditor
-        height="400px" 
-        width="600px"
+        height="100%" 
+        width="100%"
         language={language}
         
         theme="vs-dark"
