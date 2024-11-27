@@ -19,7 +19,7 @@ export default async function handler(req, res) {
 
   const role = user.role;
 
-  if (parseInt(userId, 10) !== parseInt(id, 10) && role.toLowerCase() !== 'admin') {
+  if (parseInt(userId, 10) !== parseInt(id, 10) && role.toLowerCase() !== "admin") {
     return res.status(401).json({ error: "Unauthorized action" });
   }
 
@@ -28,20 +28,48 @@ export default async function handler(req, res) {
       case "GET": {
         const user = await prisma.user.findUnique({
           where: { id: parseInt(id, 10) },
+          include: {
+            Template: {
+              select: {
+                id: true,
+                title: true,
+                explanation: true,
+                tags: true,
+                code: true,
+                stdin: true,
+                language: true,
+                createdAt: true,
+              },
+            },
+            Blog: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                tags: true,
+                createdAt: true,
+              },
+            },
+          },
         });
 
         if (!user) {
           return res.status(404).json({ error: "User not found." });
         }
 
-        // Exclude the password field from the response
-        const { password, ...userWithoutPassword } = user;
+        // Exclude sensitive fields
+        const { password, refreshToken, ...userWithoutSensitiveFields } = user;
 
-        const serializedUser = JSON.stringify(userWithoutPassword, (key, value) =>
+        // Serialize for BigInt handling
+        const serializedUser = JSON.stringify(userWithoutSensitiveFields, (key, value) =>
           typeof value === "bigint" ? value.toString() : value
         );
 
-        return res.status(200).json({ user: JSON.parse(serializedUser) });
+        return res.status(200).json({
+          user: JSON.parse(serializedUser),
+          templates: userWithoutSensitiveFields.Template || [],
+          blogs: userWithoutSensitiveFields.Blog || [],
+        });
       }
 
       case "PUT": {
@@ -79,10 +107,10 @@ export default async function handler(req, res) {
           data: updateData,
         });
 
-        // Exclude the password field from the response
-        const { password: _, ...updatedUserWithoutPassword } = updatedUser;
+        // Exclude sensitive fields
+        const { password: _, ...updatedUserWithoutSensitiveFields } = updatedUser;
 
-        const serializedUser = JSON.stringify(updatedUserWithoutPassword, (key, value) =>
+        const serializedUser = JSON.stringify(updatedUserWithoutSensitiveFields, (key, value) =>
           typeof value === "bigint" ? value.toString() : value
         );
 

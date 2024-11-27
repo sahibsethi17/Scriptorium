@@ -1,15 +1,35 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { useRouter } from "next/router";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useAuth } from "./components/AuthContext";
-import axiosInstance from "../utils/axiosInstance"; // Import the configured Axios instance
+
+interface Template {
+  id: number;
+  title: string;
+  explanation: string;
+  tags: string;
+  code: string;
+  stdin: string;
+  language: string;
+  createdAt: string;
+}
+
+interface Blog {
+  id: number;
+  title: string;
+  description: string;
+  tags: string;
+  createdAt: string;
+}
 
 const Profile: React.FC = () => {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [user, setUser] = useState<any>(null);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -22,16 +42,10 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Fetch user data using the user ID from localStorage
   useEffect(() => {
     if (isLoggedIn === null) {
       return;
     }
-
-    // if (!isLoggedIn) {
-    //   router.push("/login");
-    //   return;
-    // }
 
     const fetchUser = async () => {
       try {
@@ -50,8 +64,19 @@ const Profile: React.FC = () => {
           withCredentials: true,
         });
 
+        /* return res.status(200).json({
+          user: JSON.parse(serializedUser),
+          templates: userWithoutSensitiveFields.Template || [],
+          blogs: userWithoutSensitiveFields.Blog || [],
+        });
+        */
+
         const userData = response.data.user;
         setUser(userData);
+        setTemplates(response.data.templates || []);
+        setBlogs(response.data.blogs || []);
+        console.log(templates);
+        console.log(blogs);
         setFormData({
           username: userData.username,
           email: userData.email,
@@ -70,17 +95,14 @@ const Profile: React.FC = () => {
     fetchUser();
   }, [isLoggedIn, router]);
 
-  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle avatar change
   const handleAvatarChange = (avatar: string) => {
     setFormData({ ...formData, avatar });
   };
 
-  // Handle form submission for updating user data
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -112,7 +134,6 @@ const Profile: React.FC = () => {
     }
   };
 
-  // Handle account deletion
   const handleDeleteAccount = async () => {
     if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
       return;
@@ -232,6 +253,41 @@ const Profile: React.FC = () => {
           >
             Delete Account
           </button>
+        </div>
+
+        {/* Templates Section */}
+        <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md mt-8 dark:bg-gray-600 dark:text-white">
+          <h2 className="text-2xl font-bold mb-4">Templates</h2>
+          <ul>
+            {templates.map((template) => (
+              <li key={template.id} className="border-b pb-4 mb-4">
+                <p><strong>ID:</strong> {template.id}</p>
+                <p><strong>Title:</strong> {template.title}</p>
+                <p><strong>Explanation:</strong> {template.explanation}</p>
+                <p><strong>Tags:</strong> {template.tags}</p>
+                <p><strong>Code:</strong> <pre>{template.code}</pre></p>
+                <p><strong>Stdin:</strong> {template.stdin}</p>
+                <p><strong>Language:</strong> {template.language}</p>
+                <p><strong>Created At:</strong> {new Date(template.createdAt).toLocaleString()}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Blogs Section */}
+        <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md mt-8 dark:bg-gray-600 dark:text-white">
+          <h2 className="text-2xl font-bold mb-4">Blogs</h2>
+          <ul>
+            {blogs.map((blog) => (
+              <li key={blog.id} className="border-b pb-4 mb-4">
+                <p><strong>ID:</strong> {blog.id}</p>
+                <p><strong>Title:</strong> {blog.title}</p>
+                <p><strong>Description:</strong> {blog.description}</p>
+                <p><strong>Tags:</strong> {blog.tags}</p>
+                <p><strong>Created At:</strong> {new Date(blog.createdAt).toLocaleString()}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
       <Footer />

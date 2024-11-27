@@ -92,7 +92,7 @@ export async function verifyAuth(req) {
         
         if (isTokenExpired(refreshToken)) {
           try {
-            await axios.post('http://localhost:3000/pages/api/auth/logout');
+            await axios.post('api/auth/logout');
             return { userId: null, error: 'Session expired. Please log in again.', status: 401 };
           } catch (logoutError) {
             console.error('Logout failed:', logoutError);

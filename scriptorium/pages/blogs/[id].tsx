@@ -21,6 +21,8 @@ interface Blog {
   hidden: boolean;
   userUpvoted: boolean;
   userDownvoted: boolean;
+  userReported: boolean;
+  BlogReport: BlogReport[]
 }
 
 interface Comment {
@@ -34,6 +36,19 @@ interface Comment {
   parentId: number | null;
   blogId: number;
   hidden: boolean;
+  CommentReport: CommentReport[];
+}
+
+interface BlogReport {
+  id: number;
+  explanation: string;
+  createdAt: string;
+}
+
+interface CommentReport {
+  id: number;
+  explanation: string;
+  createdAt: string;
 }
 
 const BlogPage = () => {
@@ -48,6 +63,24 @@ const BlogPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [accessToken, setAccessToken] = useState("");
   const [commentContent, setCommentContent] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false); // Blog Modal state
+  const [explanation, setExplanation] = useState(""); // Blog Report Explanation state
+  const [selectedBlogId, setSelectedBlogId] = useState<number | null>(null); // Blog ID for reporting
+  const [reportError, setReportError] = useState<string | null>(null); // State for Blog report error message
+  const [reportSuccess, setReportSuccess] = useState<string | null>(null); // State for Blog report success message
+  const [isCommentModalOpen, setCommentModalOpen] = useState(false); // Comment Modal state
+  const [commentExplanation, setCommentExplanation] = useState(""); // Comment Report Explanation state
+  const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null); // Comment ID for reporting
+  const [commentReportError, setCommentReportError] = useState<string | null>(null); // State for Comment report error message
+  const [commentReportSuccess, setCommentReportSuccess] = useState<string | null>(null); // State for Comment report success message
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [showReportedComments, setShowReportedComments] = useState(false);
+
+  const [isBlogReportsModalOpen, setBlogReportsModalOpen] = useState(false);
+  const [selectedReports, setSelectedReports] = useState([]);
+  const [isCommentReportsModalOpen, setCommentReportsModalOpen] = useState(false);
+
+
 
   const fetchBlogPost = async () => {
     try {
@@ -57,7 +90,18 @@ const BlogPage = () => {
         },
       });
       const data = await response.json();
-      setBlog(data.blogs[0]);
+  
+      if (response.ok) {
+        const blog = data.blogs[0];
+        if (blog) {
+          setBlog({
+            ...blog,
+            BlogReport: blog.BlogReport || [],
+          });
+        }
+      } else {
+        setError(data.error || "Failed to fetch blog post");
+      }
     } catch (err) {
       setError(`Error fetching blog post: ${err}`);
     }
@@ -65,25 +109,44 @@ const BlogPage = () => {
 
   const fetchComments = async (page: number = 1) => {
     try {
-      const response = await fetch(
-        `/api/blogs/comments/?blogId=${id}&pageNum=${page}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const queryParams = new URLSearchParams({
+        blogId: String(id),
+        pageNum: String(page),
+        ...(showReportedComments && { reportedOnly: "true" }), // Use `reportedOnly` for filtering
+      });
+  
+      const response = await fetch(`/api/blogs/comments/?${queryParams}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
       const data = await response.json();
-      setComments(data.comments);
-      setTotalPages(data.totalPages);
+  
+      if (response.ok) {
+        const commentsWithReports = data.comments.map((comment) => ({
+          ...comment,
+          CommentReport: comment.CommentReport || [], // Ensure CommentReport[] is handled
+        }));
+        console.log(commentsWithReports);
+        setComments(commentsWithReports);
+        setTotalPages(data.totalPages);
+      } else {
+        setError(data.error || "Failed to fetch comments");
+      }
     } catch (err) {
       setError(`Error fetching comments: ${err}`);
     }
   };
 
-  const handlePageChange = (page: number) => {
+  const toggleReportedComments = async () => {
+    setShowReportedComments((prev) => !prev);
+    await fetchComments(); // Fetch comments based on the updated state
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = async (page: number) => {
     setCurrentPage(page);
-    fetchComments(page);
   };
 
   const handleBlogUpvote = async () => {
@@ -155,6 +218,10 @@ const BlogPage = () => {
 
   const handleCreateComment = async () => {
     try {
+      if (!isLoggedIn) {
+        window.location.href = "/login";
+        return;
+      }
       await fetch(`/api/blogs/comments/create`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -164,6 +231,7 @@ const BlogPage = () => {
         body: JSON.stringify({ blogId: blogPost.id, content: commentContent }),
       });
       await fetchComments();
+      setCommentContent("");
     } catch (err) {
       setError(`Error commenting: ${err}`);
     }
@@ -202,6 +270,229 @@ const BlogPage = () => {
     }
   }
 
+  const handleOpenBlogReportModal = (blogId: number) => {
+    setSelectedBlogId(blogId);
+    setModalOpen(true); // Open modal
+  };
+
+  const handleOpenCommentReportModal = (commentId: number) => {
+    setSelectedCommentId(commentId);
+    setCommentModalOpen(true);
+    setCommentExplanation("");
+    setCommentReportSuccess(null);
+    setCommentReportError(null);
+  }
+
+  const handleCloseBlogReportModal = () => {
+    setModalOpen(false); // Close modal
+    setExplanation(""); // Reset explanation
+    setSelectedBlogId(null); // Reset blog ID
+  };
+
+  const handleCloseCommentReportModal = () => {
+    setCommentModalOpen(false);
+    setCommentExplanation("");
+    setSelectedCommentId(null);
+  }
+
+  const handleSubmitReport = async () => {
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return;
+    }
+  
+    if (!explanation.trim()) {
+      setReportError("Explanation is required to report the blog.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`/api/blogs/report`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: selectedBlogId, explanation }),
+      });
+  
+      if (response.status === 409) {
+        // Handle duplicate report case
+        setReportError("You have already reported this blog.");
+        setBlog((prev) => prev && { ...prev, userReported: true }); // Update client state
+        return;
+      }
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to report blog. Status: ${response.status}, Message: ${errorText}`
+        );
+      }
+  
+      // Show success message and mark the blog as reported
+      setReportSuccess("Thank you for submitting your report. We will look into this issue.");
+      setBlog((prev) => prev && { ...prev, userReported: true }); // Mark as reported
+    } catch (err) {
+      console.error("Error reporting blog:", err);
+      setError(`Error reporting blog: ${err}`);
+    }
+  };
+
+  const handleSubmitCommentReport = async () => {
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return;
+    }
+  
+    if (!commentExplanation.trim()) {
+      setCommentReportError("Explanation is required to report the comment.");
+      return;
+    }
+
+    console.log(commentExplanation);
+
+  
+    try {
+      const response = await fetch(`/api/blogs/comments/report`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: selectedCommentId, explanation: commentExplanation }),
+      });
+  
+      if (response.status === 409) {
+        // Handle duplicate report case
+        setCommentReportError("You have already reported this comment.");
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === selectedCommentId ? { ...comment, userReported: true } : comment
+          )
+        );
+        return;
+      }
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to report comment. Status: ${response.status}, Message: ${errorText}`
+        );
+      }
+  
+      // Show success message and mark the comment as reported
+      setCommentReportSuccess("Thank you for submitting your report. We will look into this issue.");
+      setSelectedCommentId(null); // Clear selected comment ID after success
+      setCommentExplanation(""); // Clear explanation after success
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === selectedCommentId ? { ...comment, userReported: true } : comment
+        )
+      );
+      setSelectedCommentId(null); // Clear selected comment ID after success
+      setExplanation(""); // Clear explanation after success
+    } catch (err) {
+      console.error("Error reporting comment:", err);
+      setCommentReportError(`Error reporting comment: ${err.message}`);
+    }
+  };
+
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch("/api/user-role", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setUserRole(data.role);
+    } catch (err) {
+      console.error("Error fetching user role:", err);
+    }
+  };
+
+  const toggleBlogVisibility = async () => {
+    if (!blogPost) return;
+
+    try {
+      const url = blogPost.hidden ? "/api/blogs/unhide" : "/api/blogs/hide";
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: blogPost.id }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update visibility: ${errorText}`);
+      }
+
+      setBlog((prev) => prev && { ...prev, hidden: !prev.hidden });
+    } catch (err: any) {
+      setError(`Error toggling visibility: ${err.message}`);
+    }
+  };
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("accessToken");
+      setAccessToken(token);
+      fetchUserRole();
+    }
+  }, []);
+
+  const toggleCommentVisibility = async (commentId, isHidden) => {
+    try {
+      const url = isHidden ? "/api/blogs/comments/unhide" : "/api/blogs/comments/hide";
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: commentId }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update visibility for comment ${commentId}`);
+      }
+
+      // Update local state
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId ? { ...comment, hidden: !comment.hidden } : comment
+        )
+      );
+    } catch (err) {
+      setError(`Error toggling comment visibility: ${err.message}`);
+    }
+  };
+
+  const handleOpenBlogReportsModal = (blogReports) => {
+    setSelectedReports(blogReports);
+    setBlogReportsModalOpen(true);
+  };
+  
+  const handleOpenCommentReportsModal = (commentReports) => {
+    setSelectedReports(commentReports);
+    setCommentReportsModalOpen(true);
+  };
+  
+  const handleCloseBlogReportsModal = () => {
+    setBlogReportsModalOpen(false);
+    setSelectedReports([]);
+  };
+  
+  const handleCloseCommentReportsModal = () => {
+    setCommentReportsModalOpen(false);
+    setSelectedReports([]);
+  };
+
   // const handleCommentDownvote = async (commentId: number) => {
 
   // }
@@ -211,14 +502,17 @@ const BlogPage = () => {
       fetchBlogPost();
       fetchComments();
     }
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
-      setAccessToken(token);
-    }
   }, [id]);
 
+  // Re-fetch comments whenever `showReportedComments` or `currentPage` changes
+  useEffect(() => {
+    if (id) {
+      fetchComments(currentPage);
+    }
+  }, [showReportedComments, currentPage]);
+
   if (error) {
-    return <div className="text-red-500">Error: {error}</div>;
+    return <div className="text-red-500 justify-center">Error: {error}</div>;
   }
 
   if (!blogPost) {
@@ -230,11 +524,12 @@ const BlogPage = () => {
     <div>
       <Navbar />
       <div className="flex flex-col items-center">
-        <div className="text-left w-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg border border-gray-200 mt-8 dark:bg-gray-600">
+        <div className="text-left w-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg border border-gray-200 mt-8 dark:bg-gray-600 relative">
           <span className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               {blogPost.title}
             </h2>
+
             <div>
               <div className="flex flex-col text-sm text-gray-500 dark:text-white">
                 <div className="flex items-center">
@@ -280,14 +575,142 @@ const BlogPage = () => {
                 onUpvote={handleBlogUpvote}
                 onDownvote={handleBlogDownvote}
               />
+
+              {userRole === "ADMIN" && (
+                <button
+                  onClick={toggleBlogVisibility}
+                  className="text-gray-600 dark:text-white hover:text-gray-800"
+                  title={blogPost.hidden ? "Unhide Blog" : "Hide Blog"}
+                >
+                  {blogPost.hidden ? "Unhide Blog" : "Hide Blog"}
+                </button>
+              )}
+
+              {blogPost.hidden && (
+                <span
+                  className="ml-2 text-red-500 cursor-pointer text-2xl"
+                  title="This blog has been reported and hidden by a System Administrator."
+                >
+                  Flagged 🚩
+                </span>
+              )}
+
+              <div className="absolute bottom-4 right-4">
+                {userRole === "USER" && (
+                  <button
+                    onClick={() => handleOpenBlogReportModal(blogPost.id)}
+                    className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition duration-200"
+                    title="Report Blog"
+                  >
+                    Report
+                  </button>
+                )}
+                {userRole === "ADMIN" && (
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">
+                    <button
+                      onClick={() => handleOpenBlogReportsModal(blogPost.BlogReport)}
+                      className="text-white hover:underline"
+                    >
+                      Reports: {blogPost.reports}
+                    </button>
+                  </div>
+                )}
+
+                {isBlogReportsModalOpen && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full dark:bg-gray-900 dark:text-white">
+                      <h3 className="text-lg font-semibold mb-4">Blog Reports</h3>
+                      <ul className="space-y-2">
+                        {selectedReports.length > 0 ? (
+                          selectedReports.map((report, index) => (
+                            <li key={index} className="p-3 border rounded-md dark:border-gray-700">
+                              <p className="text-sm text-gray-800 dark:text-gray-200">
+                                <strong>Report #{index + 1}:</strong> {report.explanation}
+                              </p>
+                              <p className="text-gray-500 dark:text-gray-400 text-xs">
+                                {new Date(report.createdAt).toLocaleString()}
+                              </p>
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-gray-500 dark:text-gray-400">No reports available.</p>
+                        )}
+                      </ul>
+                      <button
+                        onClick={handleCloseBlogReportsModal}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Blog Modal */}
+              {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full dark:bg-gray-900 dark:text-white">
+                    <h3 className="text-lg font-semibold mb-4">Report Blog</h3>
+                    {reportError && (
+                      <p className="text-red-500 mt-2 text-sm">{reportError}</p>
+                    )}
+                    {reportSuccess ? (
+                      <>
+                      <p className="text-green-500 mt-2 text-sm">{reportSuccess}</p>
+                      <div className="mt-4 flex justify-end gap-2">
+                        <button
+                          onClick={handleCloseBlogReportModal}
+                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      </>
+                    ) : (
+                      <>
+                        <textarea
+                        value={explanation}
+                        onChange={(e) => setExplanation(e.target.value)}
+                        placeholder="Please provide a reason for reporting this blog..."
+                        className="w-full bg-white p-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-600"
+                        rows={4}
+                        />
+                      <div className="mt-4 flex justify-end gap-2">
+                          <button
+                            onClick={handleSubmitReport}
+                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
+                          >
+                            Submit
+                          </button>
+                        <button
+                          onClick={handleCloseBlogReportModal}
+                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
         {/* Comments Section */}
-        <div className="mt-8 w-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg border border-gray-200 dark:bg-gray-600">
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-            Comments
-          </h3>
+        <div className="mt-8 w-full max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg relative border border-gray-200 dark:bg-gray-600">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Comments</h3>
+            {userRole === "ADMIN" && (
+              <button
+                onClick={toggleReportedComments}
+                className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition duration-200"
+              >
+                {showReportedComments ? "Show All Comments" : "Show Reported Comments"}
+              </button>
+            )}
+          </div>
 
           {/* Comment Input Section */}
           <div className="mb-4">
@@ -331,6 +754,71 @@ const BlogPage = () => {
                       <p className="text-gray-500 dark:text-gray-400 text-xs">
                         {new Date(comment.createdAt).toLocaleString()}
                       </p>
+                      {userRole === "USER" && (<button
+                        onClick={() => handleOpenCommentReportModal(comment.id)}
+                        className="px-1 py-0.5 bg-red-500 text-white font-small rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition duration-200"
+                        title="Report Comment"
+                      >
+                        Report
+                      </button>
+                      )}
+
+                      {/* Show number of reports and hide/unhide button for ADMIN */}
+                      {userRole === "ADMIN" && (
+                        <div className="ml-auto flex items-center space-x-4">
+                          <button
+                            onClick={() => handleOpenCommentReportsModal(comment.CommentReport)}
+                            className="px-1 py-0.5 text-white hover:underline"
+                          >
+                            Reports: {comment.reports}
+                          </button>
+                          <button
+                            onClick={() => toggleCommentVisibility(comment.id, comment.hidden)}
+                            className="px-1 py-0.5 text-gray-600 dark:text-white hover:text-gray-800"
+                            title={comment.hidden ? "Unhide Comment" : "Hide Comment"}
+                          >
+                            {comment.hidden ? "Unhide" : "Hide"}
+                          </button>
+                        </div>
+                      )}
+                        {comment.hidden && (
+                          <span
+                            className="text-red-500 text-lg cursor-pointer"
+                            title="This comment has been hidden by a System Administrator."
+                          >
+                            Flagged 🚩
+                          </span>
+                        )}
+
+                      {isCommentReportsModalOpen && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                          <div className="bg-white rounded-lg p-6 max-w-md w-full dark:bg-gray-900 dark:text-white">
+                            <h3 className="text-lg font-semibold mb-4">Comment Reports</h3>
+                            <ul className="space-y-2">
+                              {selectedReports.length > 0 ? (
+                                selectedReports.map((report, index) => (
+                                  <li key={index} className="p-3 border rounded-md dark:border-gray-700">
+                                    <p className="text-sm text-gray-800 dark:text-gray-200">
+                                      <strong>Report #{index + 1}:</strong> {report.explanation}
+                                    </p>
+                                    <p className="text-gray-500 dark:text-gray-400 text-xs">
+                                      {new Date(report.createdAt).toLocaleString()}
+                                    </p>
+                                  </li>
+                                ))
+                              ) : (
+                                <p className="text-gray-500 dark:text-gray-400">No reports available.</p>
+                              )}
+                            </ul>
+                            <button
+                              onClick={handleCloseCommentReportsModal}
+                              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Comment Content */}
@@ -339,6 +827,58 @@ const BlogPage = () => {
                         {comment.content}
                       </p>
                     </div>
+
+                    {/* Comment Report Modal */}
+                    {isCommentModalOpen && (
+                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white rounded-lg p-6 max-w-md w-full py-10 dark:bg-gray-900 dark:text-white relative">
+                          <h3 className="text-lg font-semibold mb-4">Report Comment</h3>
+
+                          {/* Display Error Message */}
+                          {commentReportError && (
+                            <p className="text-red-500 mt-2 text-sm">{commentReportError}</p>
+                          )}
+
+                          {/* Display Success Message */}
+                          {commentReportSuccess ? (
+                            <>
+                              <p className="text-green-500 mt-2 text-sm">{commentReportSuccess}</p>
+                              <button
+                                onClick={handleCloseCommentReportModal}
+                                className="absolute bottom-4 right-4 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                              >
+                                Close
+                              </button>
+                            </>
+                          ) : (
+                            // Display textarea and buttons for reporting
+                            <>
+                              <textarea
+                                value={commentExplanation}
+                                onChange={(e) => setCommentExplanation(e.target.value)}
+                                placeholder="Please provide a reason for reporting this comment..."
+                                className="w-full bg-white p-2 border rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-600"
+                                rows={4}
+                              />
+                              <div className="mt-4 flex justify-end gap-2">
+                                <button
+                                  onClick={handleSubmitCommentReport}
+                                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
+                                >
+                                  Submit
+                                </button>
+                                <button
+                                  onClick={handleCloseCommentReportModal}
+                                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

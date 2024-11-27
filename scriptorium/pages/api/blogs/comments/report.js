@@ -11,6 +11,8 @@ export default async function handler(req, res) {
 
         let { id, explanation } = req.body;
 
+        console.log(explanation);
+
         // If invalid parameters
         if (!id) return res.status(400).json({ error: "Comment ID is invalid" });
 

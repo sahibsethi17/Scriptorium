@@ -15,8 +15,10 @@ const Blogs = () => {
     order: "",
     templateIds: "",
     pageNum: 1,
+    isReported: false,
   });
-
+  const [userRole, setUserRole] = useState<string | null>(null); // Store user role
+  const [accessToken, setAccessToken] = useState("");
   const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
   const [error, setError] = useState("");
 
@@ -30,7 +32,13 @@ const Blogs = () => {
         }, {} as Record<string, string>)
       ).toString();
 
-      const res = await fetch(`/api/blogs?${query}`);
+
+      const res = await fetch(`/api/blogs?${query}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
       const data = await res.json();
 
       if (data.error) {
@@ -54,13 +62,44 @@ const Blogs = () => {
   ) => {
     setSearchParams({
       ...searchParams,
+      pageNum: 1,
       [e.target.name]: e.target.value,
     });
   };
 
+  const fetchUserRole = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch("/api/user-role", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setUserRole(data.role);
+      }
+    } catch (err: any) {
+      setError("Failed to fetch user role.");
+    }
+  };
+
   useEffect(() => {
-    fetchBlogs();
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      setAccessToken(token); // Set accessToken before fetching the user role
+      fetchUserRole();
+    } else {
+      setError("You are not logged in.");
+    }
+  }, []);
+
+  useEffect(() => {
+      fetchBlogs();
   }, [searchParams]);
+
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
@@ -114,6 +153,9 @@ const Blogs = () => {
               <option value="">None</option>
               <option value="upvotes">Upvotes</option>
               <option value="downvotes">Downvotes</option>
+              {userRole === "ADMIN" && (
+                <option value="reports">Reports</option>
+              )}
             </select>
           </div>
         </div>
@@ -139,6 +181,14 @@ const Blogs = () => {
                   <span className="text-black dark:text-white">Upvotes: {blog.upvotes}</span>
                   <span className="text-black dark:text-white">Downvotes: {blog.downvotes}</span>
                 </div>
+
+                {/* Display reports count for admins */}
+                {userRole === "ADMIN" && (
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-300">
+                    Reports: {blog.reports}
+                  </div>
+                )}
+
                 <div className="text-sm text-gray-400 mt-2 dark:text-gray-200">
                   Tags: 
                   {blog.tags.split(',').map((tag, index) => (

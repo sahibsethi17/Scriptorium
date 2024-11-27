@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { blogId, content, order, pageNum } = req.query;
+  const { blogId, content, order, pageNum, reportedOnly } = req.query;
 
   if (!blogId) return res.status(400).json({ error: "Blog ID is invalid" });
 
@@ -28,7 +28,6 @@ export default async function handler(req, res) {
   let currentUserId = null;
 
   if (userId) {
-    // Retrieve the user role and ID if the user is logged in
     const { role, id } = await prisma.user.findUnique({
       where: { id: Number(userId) },
       select: { role: true, id: true },
@@ -37,9 +36,21 @@ export default async function handler(req, res) {
     currentUserId = id;
   }
 
-  // Apply hidden filter
-  if (!isAdmin) filter.hidden = false; // Show non-hidden blogs to all users
+  // Apply hidden filter logic
   filter.blogId = Number(blogId);
+
+  if (reportedOnly === "true") {
+    if (!isAdmin) {
+      return res.status(403).json({ error: "Forbidden: Insufficient permissions" });
+    }
+    filter.reports = { gt: 0 }; // Include only reported comments
+  } else if (!isAdmin) {
+    // Include hidden comments if they are authored by the current user
+    filter.OR = [
+      { hidden: false },
+      { AND: [{ hidden: true }, { userId: currentUserId }] },
+    ];
+  }
 
   // Finalize the order in which the comments are sorted
   let orderBy = {};
@@ -53,8 +64,8 @@ export default async function handler(req, res) {
         break;
       case "reports":
         // Verify that the user is an admin
-        if (!userId) {
-          return res.status(401).json({ error: "Unauthorized action" });
+        if (!isAdmin) {
+          return res.status(403).json({ error: "Forbidden: Insufficient permissions" });
         }
         const { role } = await prisma.user.findUnique({
           where: {
@@ -66,10 +77,11 @@ export default async function handler(req, res) {
         }
         orderBy.reports = "desc";
         break;
+      default:
+        orderBy.createdAt = "desc";
     }
   }
 
-  // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- how to use the orderBy keyword
   try {
     console.log(filter);
     let comments = await prisma.comment.findMany({
@@ -82,19 +94,25 @@ export default async function handler(req, res) {
             avatar: true,
           },
         },
+        CommentReport: {
+          select: {
+            id: true,
+            explanation: true,
+            createdAt: true,
+          },
+        },
       },
     });
-
+    
     // Pagination handling
     const page = pageNum ? parseInt(pageNum) : 1;
     const paginatedComments = paginate(comments, page);
-
+    
     return res.status(200).json({
       comments: paginatedComments.items,
       totalPages: paginatedComments.totalPages,
       totalItems: paginatedComments.totalItems,
     });
-    
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: "Internal server error" });

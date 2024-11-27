@@ -14,6 +14,27 @@ const Navbar: React.FC = () => {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  // Handle light/dark mode
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === "dark");
+      document.documentElement.classList.toggle("dark", storedTheme === "dark");
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setIsDarkMode(prefersDark);
+      document.documentElement.classList.toggle("dark", prefersDark);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = isDarkMode ? "light" : "dark";
+    setIsDarkMode(!isDarkMode);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
 
   // Fetch user data including the avatar
   useEffect(() => {
@@ -63,7 +84,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-background text-foreground px-6 py-4 flex justify-between items-center shadow-md dark:bg-gray-900 dark:text-white">
+    <nav className="bg-background text-foreground from-gray-900 via-gray-800 to-gray-900 px-6 py-4 flex justify-between items-center shadow-md dark:bg-gradient-to-r dark:text-white">
       <div
         className="text-2xl font-bold cursor-pointer hover:scale-110 transition-transform duration-300"
         onClick={() => router.push("/")}
@@ -71,6 +92,14 @@ const Navbar: React.FC = () => {
         Scriptorium
       </div>
       <div className="flex space-x-4 items-center">
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded"
+        >
+          {isDarkMode ? "🌙" : "☀️"}
+        </button>
+
         {isLoggedIn ? (
           <>
             <a

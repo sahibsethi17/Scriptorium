@@ -1,3 +1,5 @@
+// GENERATED WITH CHATGPT (PROMPT: Give a privacy policy page for a website)
+
 import React from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
