@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { blogId, content, order, pageNum, reportedOnly } = req.query;
+  const { blogId, content, order, pageNum, parentId, reportedOnly } = req.query;
 
   if (!blogId) return res.status(400).json({ error: "Blog ID is invalid" });
 
@@ -80,6 +80,14 @@ export default async function handler(req, res) {
       default:
         orderBy.createdAt = "desc";
     }
+  } else {
+    orderBy.createdAt = "asc";
+  }
+
+  if (parentId) {
+    filter.parentId = Number(parentId);
+  } else {
+    filter.parentId = null;
   }
 
   try {
@@ -99,6 +107,16 @@ export default async function handler(req, res) {
             id: true,
             explanation: true,
             createdAt: true,
+          }
+        },
+        replies: { 
+          include: {
+            user: {
+              select: {
+                username: true,
+                avatar: true,
+              },
+            },
           },
         },
       },
@@ -107,7 +125,34 @@ export default async function handler(req, res) {
     // Pagination handling
     const page = pageNum ? parseInt(pageNum) : 1;
     const paginatedComments = paginate(comments, page);
-    
+
+    if (userId) {
+      for (let i = 0; i < paginatedComments.items.length; i++) {
+        const existingVote = await prisma.commentVote.findUnique({
+          where: {
+            userId_commentId: {
+              userId: Number(userId),
+              commentId: Number(paginatedComments.items[i].id),
+            },
+          },
+        });
+        if (existingVote) {
+          if (existingVote.type === "UPVOTE") {
+            paginatedComments.items[i].userUpvoted = true;
+            paginatedComments.items[i].userDownvoted = false;
+          } else if (existingVote.type === "DOWNVOTE") {
+            paginatedComments.items[i].userUpvoted = false;
+            paginatedComments.items[i].userDownvoted = true;
+          } else {
+            paginatedComments.items[i].userUpvoted = false;
+            paginatedComments.items[i].userDownvoted = false;
+          }
+        }
+      }
+    }
+
+    if (!order) paginatedComments.items.reverse(); // ensure comments are in reverse chronological order by default
+
     return res.status(200).json({
       comments: paginatedComments.items,
       totalPages: paginatedComments.totalPages,

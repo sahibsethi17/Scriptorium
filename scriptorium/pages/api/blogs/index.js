@@ -105,6 +105,8 @@ export default async function handler(req, res) {
                 };
                 prismaInput.orderBy = [{ reports: "desc" }];
               }
+            } else {
+              prismaInput.orderBy = [{ 'createdAt': 'desc'}];
             }
           
             let blogsQuery = await prisma.blog.findMany(prismaInput);
@@ -114,8 +116,16 @@ export default async function handler(req, res) {
             // Pagination handling
             const page = pageNum ? parseInt(pageNum) : 1;
             const paginatedBlogs = paginate(blogsQuery, page);
-          
-            // Add username and avatar
+
+            // Get the username of the user that created this blog
+            if (!paginatedBlogs.items[0]) {
+                return res.status(200).json({
+                    blogs: [],   
+                    totalPages: 0, 
+                    totalItems: 0  
+                });
+            }
+
             const user = await prisma.user.findUnique({
               where: { id: paginatedBlogs.items[0]?.userId },
               select: { username: true, avatar: true },
