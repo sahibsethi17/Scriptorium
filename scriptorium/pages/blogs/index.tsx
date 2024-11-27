@@ -1,11 +1,13 @@
 // MODIFIED FROM CHATGPT
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router"; // Import useRouter for navigation
 import Pagination from "pages/components/Pagination";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 const Blogs = () => {
+  const router = useRouter();
   const [blogs, setBlogs] = useState([]);
   const [searchParams, setSearchParams] = useState({
     id: "",
@@ -22,6 +24,22 @@ const Blogs = () => {
   const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
   const [error, setError] = useState("");
 
+  // Helper to sync URL query string
+  const syncURL = (params: Record<string, any>) => {
+    const queryString = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== "") acc[key] = String(value); // Avoid empty values in the URL
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+
+    // Push new state to the browser's URL bar without reloading
+    router.replace({ pathname: "/blogs", search: queryString }, undefined, {
+      shallow: true,
+    });
+  };
+
+  // Fetch blogs based on searchParams
   const fetchBlogs = async () => {
     setError("");
     try {
@@ -31,7 +49,6 @@ const Blogs = () => {
           return acc;
         }, {} as Record<string, string>)
       ).toString();
-
 
       const res = await fetch(`/api/blogs?${query}`, {
         headers: {
@@ -94,12 +111,21 @@ const Blogs = () => {
     } else {
       setError("You are not logged in.");
     }
+
+    // Populate searchParams from the URL query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const params: Record<string, any> = {};
+    urlParams.forEach((value, key) => {
+      params[key] = value;
+    });
+
+    setSearchParams((prev) => ({ ...prev, ...params }));
   }, []);
 
   useEffect(() => {
-      fetchBlogs();
+    syncURL(searchParams); // Sync URL query string with state
+    fetchBlogs(); // Fetch blogs based on updated searchParams
   }, [searchParams]);
-
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-800 dark:text-white">
