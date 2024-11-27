@@ -122,7 +122,7 @@ const Blogs = () => {
               onChange={handleInputChange}
               className="search-input rounded bg-gray-100 dark:bg-gray-900 dark:text-white"
             >
-              <option value="">None</option>
+              <option value="">Newest</option>
               <option value="upvotes">Upvotes</option>
               <option value="downvotes">Downvotes</option>
             </select>

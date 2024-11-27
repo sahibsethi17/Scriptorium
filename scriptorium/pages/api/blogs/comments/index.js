@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { blogId, content, order, pageNum } = req.query;
+  const { blogId, content, order, pageNum, parentId } = req.query;
 
   if (!blogId) return res.status(400).json({ error: "Blog ID is invalid" });
 
@@ -71,6 +71,12 @@ export default async function handler(req, res) {
     orderBy.createdAt = "asc";
   }
 
+  if (parentId) {
+    filter.parentId = Number(parentId);
+  } else {
+    filter.parentId = null;
+  }
+
   // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- how to use the orderBy keyword
   try {
     console.log(filter);
@@ -82,6 +88,16 @@ export default async function handler(req, res) {
           select: {
             username: true,
             avatar: true,
+          },
+        },
+        replies: { 
+          include: {
+            user: {
+              select: {
+                username: true,
+                avatar: true,
+              },
+            },
           },
         },
       },
@@ -109,6 +125,9 @@ export default async function handler(req, res) {
           } else if (existingVote.type === "DOWNVOTE") {
             paginatedComments.items[i].userUpvoted = false;
             paginatedComments.items[i].userDownvoted = true;
+          } else {
+            paginatedComments.items[i].userUpvoted = false;
+            paginatedComments.items[i].userDownvoted = false;
           }
         }
       }
