@@ -20,35 +20,42 @@ export default async function handler(req, res) {
     };
   }
 
-  // Check if we have a logged in user
-  const auth = await verifyAuth(req);
-  let userId;
-  if (auth) userId = auth.userId;
-  let isAdmin = false;
-  let currentUserId = null;
+  const auth = await verifyAuth(req); // Verify authentication
+  let userRole = null;
+  let userId = -1;
 
-  if (userId) {
-    const { role, id } = await prisma.user.findUnique({
+  console.log(222);
+  if (auth) {
+    userId = auth.userId;
+
+    const user = await prisma.user.findUnique({
       where: { id: Number(userId) },
-      select: { role: true, id: true },
+      select: { role: true },
     });
-    isAdmin = role.toLowerCase() === "admin";
-    currentUserId = id;
+
+    if (user) {
+      userRole = user.role.toUpperCase();
+    }
   }
+  console.log(444);
+
+  const isAdmin = userRole === "ADMIN"; // Determine if the user is an admin
 
   // Apply hidden filter logic
   filter.blogId = Number(blogId);
 
   if (reportedOnly === "true") {
     if (!isAdmin) {
-      return res.status(403).json({ error: "Forbidden: Insufficient permissions" });
+      return res
+        .status(403)
+        .json({ error: "Forbidden: Insufficient permissions" });
     }
     filter.reports = { gt: 0 }; // Include only reported comments
   } else if (!isAdmin) {
     // Include hidden comments if they are authored by the current user
     filter.OR = [
       { hidden: false },
-      { AND: [{ hidden: true }, { userId: currentUserId }] },
+      { AND: [{ hidden: true }, { userId: Number(userId) }] },
     ];
   }
 
@@ -65,7 +72,9 @@ export default async function handler(req, res) {
       case "reports":
         // Verify that the user is an admin
         if (!isAdmin) {
-          return res.status(403).json({ error: "Forbidden: Insufficient permissions" });
+          return res
+            .status(403)
+            .json({ error: "Forbidden: Insufficient permissions" });
         }
         const { role } = await prisma.user.findUnique({
           where: {
@@ -91,7 +100,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log(filter);
+    console.log("Filter:", filter);
+    console.log("Filter.OR:", filter.OR);
+    console.log("OrderBy:", orderBy);
     let comments = await prisma.comment.findMany({
       orderBy: orderBy,
       where: filter,
@@ -107,9 +118,9 @@ export default async function handler(req, res) {
             id: true,
             explanation: true,
             createdAt: true,
-          }
+          },
         },
-        replies: { 
+        replies: {
           include: {
             user: {
               select: {
@@ -121,7 +132,8 @@ export default async function handler(req, res) {
         },
       },
     });
-    
+    console.log("comments: \n" + comments);
+
     // Pagination handling
     const page = pageNum ? parseInt(pageNum) : 1;
     const paginatedComments = paginate(comments, page);
