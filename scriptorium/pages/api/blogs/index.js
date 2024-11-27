@@ -70,6 +70,7 @@ export default async function handler(req, res) {
         try {
             let prismaInput = {where: filter}
             if (order) order == 'upvotes' ? prismaInput.orderBy = [{ 'upvotes': 'desc'}] : prismaInput.orderBy = [{ 'downvotes': 'desc'}];
+            else prismaInput.orderBy = [{ 'createdAt': 'desc'}];
             console.log(prismaInput)
             let blogsQuery = await prisma.blog.findMany(prismaInput);
         

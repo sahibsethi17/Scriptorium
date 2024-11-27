@@ -67,6 +67,8 @@ export default async function handler(req, res) {
         orderBy.reports = "desc";
         break;
     }
+  } else {
+    orderBy.createdAt = "asc";
   }
 
   // SOURCE: https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting -- how to use the orderBy keyword
@@ -111,6 +113,8 @@ export default async function handler(req, res) {
         }
       }
     }
+
+    if (!order) paginatedComments.items.reverse(); // ensure comments are in reverse chronological order by default
 
     return res.status(200).json({
       comments: paginatedComments.items,

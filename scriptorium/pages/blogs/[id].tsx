@@ -276,7 +276,6 @@ const BlogPage = () => {
     return <div>Loading...</div>;
   }
 
-  // GENERATED WITH CHATGPT
   return (
     <div>
       <Navbar />
