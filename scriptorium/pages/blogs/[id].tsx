@@ -218,6 +218,10 @@ const BlogPage = () => {
   };
 
   const handleToggleReplyInput = (parentId: number) => {
+    if (!isLoggedIn) {
+      window.location.href = "/login";
+      return;
+    }
     setShowReplyInput((prev) => ({ ...prev, [parentId]: !prev[parentId] }));
   };
 
