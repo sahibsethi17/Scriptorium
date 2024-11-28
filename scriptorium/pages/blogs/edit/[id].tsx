@@ -1,4 +1,4 @@
-import { useAuth } from "pages/components/AuthContext";
+import { useAuth } from "../../../src/components/AuthContext";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Navbar from "../../components/Navbar";
