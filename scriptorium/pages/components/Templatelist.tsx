@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// VIEWING BLOGS FROM TEMPLATE ADDED BY CHATGPT
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 interface TemplateListProps {
   refreshTrigger: number;
@@ -8,23 +10,27 @@ interface TemplateListProps {
   onFork: (template: any) => void;
 }
 
-const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEdit, onFork }) => {
+const TemplateList: React.FC<TemplateListProps> = ({
+  refreshTrigger,
+  onRun,
+  onEdit,
+  onFork,
+}) => {
   const [templates, setTemplates] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null); // Store logged-in user's ID
-  const [currentPage, setCurrentPage] = useState(1); // Current page
-  const [totalPages, setTotalPages] = useState(1); // Total number of pages
-  const [searchTitle, setSearchTitle] = useState('');
-  const [searchExplanation, setSearchExplanation] = useState('');
-  const [searchTags, setSearchTags] = useState('');
-  const itemsPerPage = 5; // Number of templates per page
+  const [loggedInUserId, setLoggedInUserId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchExplanation, setSearchExplanation] = useState("");
+  const [searchTags, setSearchTags] = useState("");
+  const itemsPerPage = 5;
 
   useEffect(() => {
-    // Fetch templates with pagination
     const fetchTemplates = async () => {
       try {
-        const response = await axios.get('/api/templates', {
+        const response = await axios.get("/api/templates", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           params: {
             page: currentPage,
@@ -32,21 +38,20 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
           },
         });
         setTemplates(response.data.templates);
-        setTotalPages(response.data.totalPages); // Set the total number of pages
+        setTotalPages(response.data.totalPages);
       } catch (error) {
-        console.error('Error fetching templates:', error);
+        console.error("Error fetching templates:", error);
       }
     };
 
-    // Fetch logged-in user's ID
     const fetchUserId = async () => {
       try {
-        const userId = localStorage.getItem('userId');
+        const userId = localStorage.getItem("userId");
         if (userId) {
           setLoggedInUserId(parseInt(userId, 10));
         }
       } catch (error) {
-        console.error('Error fetching user ID:', error);
+        console.error("Error fetching user ID:", error);
       }
     };
 
@@ -55,28 +60,39 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
   }, [refreshTrigger, currentPage]);
 
   const handleDeleteTemplate = async (templateId: number) => {
+    if (!loggedInUserId) {
+      window.location.href = "/login";
+      return;
+    }
     try {
       await axios.delete(`/api/templates/${templateId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
       setTemplates((prevTemplates) =>
         prevTemplates.filter((template: any) => template.id !== templateId)
       );
     } catch (error) {
-      console.error('Error deleting template:', error);
-      alert('Failed to delete template');
+      console.error("Error deleting template:", error);
+      alert("Failed to delete template");
     }
   };
 
   const filteredTemplates = templates.filter((template: any) => {
-    const titleMatch = template.title.toLowerCase().includes(searchTitle.toLowerCase());
-    const explanationMatch = template.explanation.toLowerCase().includes(searchExplanation.toLowerCase());
+    const titleMatch = template.title
+      .toLowerCase()
+      .includes(searchTitle.toLowerCase());
+    const explanationMatch = template.explanation
+      .toLowerCase()
+      .includes(searchExplanation.toLowerCase());
     const tagsMatch = searchTags
-      ? template.tags?.split(',').some((tag: string) =>
-          tag.trim().toLowerCase() === searchTags.trim().toLowerCase()
-        )
+      ? template.tags
+          ?.split(",")
+          .some(
+            (tag: string) =>
+              tag.trim().toLowerCase() === searchTags.trim().toLowerCase()
+          )
       : true;
 
     return titleMatch && explanationMatch && tagsMatch;
@@ -96,7 +112,9 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4 text-black dark:text-white">Templates</h2>
+      <h2 className="text-xl font-bold mb-4 text-black dark:text-white">
+        Templates
+      </h2>
       <div className="mb-4">
         <input
           type="text"
@@ -126,11 +144,22 @@ const TemplateList: React.FC<TemplateListProps> = ({ refreshTrigger, onRun, onEd
             key={template.id}
             className="border rounded p-4 shadow-sm bg-white text-black dark:bg-gray-900 dark:text-white"
           >
-            <h3 className="text-lg font-semibold dark:text-white">{template.title}</h3>
+            <h3 className="text-lg font-semibold dark:text-white">
+              {template.title}
+            </h3>
             <p className="text-sm text-gray-600 mb-2">{template.explanation}</p>
             <div className="text-sm text-blue-500">
-              Tags: {template.tags ? template.tags.split(',').join(', ') : 'None'}
+              Tags:{" "}
+              {template.tags ? template.tags.split(",").join(", ") : "None"}
             </div>
+            <a
+              href={`http://localhost:3000/blogs?templateIds=${template.id}&pageNum=1&isReported=false`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline mt-2 block"
+            >
+              View Blogs for Template
+            </a>
             {loggedInUserId === template.userId && (
               <span className="block bg-green-400 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mt-2">
                 Created by You

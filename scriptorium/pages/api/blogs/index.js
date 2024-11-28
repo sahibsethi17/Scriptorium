@@ -47,13 +47,14 @@ export default async function handler(req, res) {
                     ],
                   },
               include: {
+                templates: true, 
                 BlogReport: {
                   select: {
                     id: true,
                     explanation: true,
                     createdAt: true,
                   },
-                },
+                }, 
               },
             });
             totalPages = Math.ceil(blogs.length / 10);
@@ -92,7 +93,7 @@ export default async function handler(req, res) {
             }
           
             // Include BlogReport in Prisma query
-            const prismaInput = { where: filter, include: { BlogReport: { select: { id: true, explanation: true, createdAt: true } } } };
+            const prismaInput = { where: filter, include: { templates: true, BlogReport: { select: { id: true, explanation: true, createdAt: true } } } };
             if (order) {
               if (order === "upvotes") {
                 prismaInput.orderBy = [{ upvotes: "desc" }];

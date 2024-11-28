@@ -8,6 +8,20 @@ import Footer from "pages/components/Footer";
 import Pagination from "pages/components/Pagination";
 import Rating from "pages/components/Rating";
 
+interface Template {
+  id: number;
+  userId: number;
+  title: string;
+  explanation: string;
+  tags: string;
+  code: string;
+  stdin: string;
+  language: string;
+  forkedFrom: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Blog {
   id: number;
   userId: number;
@@ -25,6 +39,7 @@ interface Blog {
   userDownvoted: boolean;
   userReported: boolean;
   BlogReport: BlogReport[];
+  templates: Template[];
 }
 
 interface Comment {
@@ -94,11 +109,11 @@ const BlogPage = () => {
   const [replyContent, setReplyContent] = useState<{ [key: number]: string }>(
     {}
   );
-  const [replies, setReplies] = useState({});
 
   const [showReplyInput, setShowReplyInput] = useState<{
     [key: number]: boolean;
   }>({});
+  const [templates, setTemplates] = useState([]);
 
   const fetchBlogPost = async () => {
     try {
@@ -116,6 +131,9 @@ const BlogPage = () => {
             ...blog,
             BlogReport: blog.BlogReport || [],
           });
+          if (blog.templates) {
+            setTemplates(blog.templates);
+          }
         }
       } else {
         setError(data.error || "Failed to fetch blog post");
@@ -133,7 +151,7 @@ const BlogPage = () => {
         order: commentsOrder,
         ...(showReportedComments && { reportedOnly: "true" }), // Use `reportedOnly` for filtering
       });
-      console.log(queryParams)
+      console.log(queryParams);
 
       const response = await fetch(`/api/blogs/comments/?${queryParams}`, {
         headers: {
@@ -741,7 +759,6 @@ const BlogPage = () => {
                 >
                   Post Reply
                 </button>
-                
               </div>
             )}
             {renderReplies(reply.replies, reply.id)}
@@ -797,6 +814,42 @@ const BlogPage = () => {
             ))}
           </div>
 
+          {/* Template Information */}
+          {templates.length > 0 && (
+            <div className="mt-8 text-gray-200 dark:bg-gray-700 p-4 rounded-lg shadow-sm border">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                Code Templates Included:
+              </h3>
+
+              {templates.map((template, index) => (
+                <div
+                  key={template.id}
+                  className="mb-6 p-6 bg-white rounded-lg shadow-md border dark:bg-gray-700 dark:text-white"
+                >
+                  <h4 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">
+                    {template.title}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    {template.explanation}
+                  </p>
+
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
+                    <p>
+                      <strong>Language:</strong> {template.language}
+                    </p>
+                    <p>
+                      <strong>Tags:</strong> {template.tags}
+                    </p>
+                  </div>
+
+                    <pre className="whitespace-pre-wrap break-words">
+                      {template.code}
+                    </pre>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="mt-6 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <Rating
@@ -808,7 +861,7 @@ const BlogPage = () => {
                 onDownvote={handleBlogDownvote}
               />
               {userRole === "ADMIN" && (
-                <div className="text-gray-600 dark:text-white hover:text-gray-800"> 
+                <div className="text-gray-600 dark:text-white hover:text-gray-800">
                   <button
                     onClick={() =>
                       handleOpenBlogReportsModal(blogPost.BlogReport)
@@ -840,7 +893,6 @@ const BlogPage = () => {
               )}
 
               <div className="absolute bottom-4 right-4">
-
                 {isBlogReportsModalOpen && (
                   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full dark:bg-gray-900 dark:text-white">
@@ -932,15 +984,15 @@ const BlogPage = () => {
               )}
             </div>
             <div>
-            {userRole === "USER" && (
-                  <button
-                    onClick={() => handleOpenBlogReportModal(blogPost.id)}
-                    className="mr-2 bg-red-600"
-                    title="Report Blog"
-                  >
-                    Report
-                  </button>
-                )}
+              {userRole === "USER" && (
+                <button
+                  onClick={() => handleOpenBlogReportModal(blogPost.id)}
+                  className="mr-2 bg-red-600"
+                  title="Report Blog"
+                >
+                  Report
+                </button>
+              )}
               {blogPost.userId === Number(loggedInUserId) ? (
                 <button onClick={handleBlogEdit} className="mr-1">
                   Edit
@@ -949,10 +1001,7 @@ const BlogPage = () => {
                 ""
               )}
               {blogPost.userId === Number(loggedInUserId) ? (
-                <button
-                  onClick={handleBlogDelete}
-                  className="ml-1 bg-red-600"
-                >
+                <button onClick={handleBlogDelete} className="ml-1 bg-red-600">
                   Delete
                 </button>
               ) : (
