@@ -3,7 +3,7 @@ import axios from "axios";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useRouter } from "next/router";
-import { useAuth } from "./components/AuthContext";
+import { useAuth } from "../src/components/AuthContext";
 
 const Login: React.FC = () => {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../../src/components/AuthContext";
 import Footer from "pages/components/Footer";
 import Pagination from "pages/components/Pagination";
 import Rating from "pages/components/Rating";

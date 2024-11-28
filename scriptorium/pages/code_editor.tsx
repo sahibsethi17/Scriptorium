@@ -8,7 +8,7 @@ import TemplateList from './components/Templatelist';
 import axios from 'axios';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import { useAuth } from './components/AuthContext'; // Import AuthContext
+import { useAuth } from '../src/components/AuthContext'; // Import AuthContext
 import router from 'next/router';
 
 const App: React.FC = () => {

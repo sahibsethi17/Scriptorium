@@ -3,7 +3,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { useRouter } from "next/router";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import { useAuth } from "./components/AuthContext";
+import { useAuth } from "../src/components/AuthContext";
 
 interface Template {
   id: number;
