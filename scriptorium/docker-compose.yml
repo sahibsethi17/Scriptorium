@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  python:
+    image: python:3.10
+    container_name: python-container
+    stdin_open: true
+    tty: true
+
+  node:
+    image: node:18
+    container_name: node-container
+    stdin_open: true
+    tty: true
+
+  gcc:
+    image: gcc:latest
+    container_name: gcc-container
+    stdin_open: true
+    tty: true
+
+  openjdk:
+    image: openjdk:17
+    container_name: openjdk-container
+    stdin_open: true
+    tty: true
+
+  php:
+    image: php:8.0-cli
+    container_name: php-container
+    stdin_open: true
+    tty: true
+
+  ruby:
+    image: ruby:3.0
+    container_name: ruby-container
+    stdin_open: true
+    tty: true
+
+  golang:
+    image: golang:1.16
+    container_name: golang-container
+    stdin_open: true
+    tty: true
+
+  swift:
+    image: swift:5.8
+    container_name: swift-container
+    stdin_open: true
+    tty: true
+
+  rust:
+    image: rust:latest
+    container_name: rust-container
+    stdin_open: true
+    tty: true
