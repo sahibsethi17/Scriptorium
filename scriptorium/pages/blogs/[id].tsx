@@ -42,6 +42,11 @@ interface Blog {
   templates: Template[];
 }
 
+interface User {
+  username: string;
+  avatar: string;
+}
+
 interface Comment {
   id: number;
   userId: number;
@@ -57,6 +62,7 @@ interface Comment {
   userDownvoted: boolean;
   replies?: Comment[];
   CommentReport: CommentReport[];
+  user?: User; // Add the user property here
 }
 
 interface BlogReport {
@@ -703,12 +709,12 @@ const BlogPage = () => {
           <li key={reply.id} className="mb-4">
             <div className="flex items-center space-x-3">
               <img
-                src={`../../uploads/avatars/${reply.user.avatar}`}
-                alt={`${reply.user.username}'s avatar`}
+                src={`../../uploads/avatars/${reply.user?.avatar || "man.png"}`}
+                alt={`${reply.user?.username || "Anonymous"}'s avatar`}
                 className="w-8 h-8 rounded-full object-cover"
               />
               <p className="text-gray-700 dark:text-gray-200 text-sm font-medium">
-                {reply.user.username}
+                {reply.user?.username || "Anonymous"}
               </p>
               <p className="text-gray-500 dark:text-gray-400 text-xs">
                 {new Date(reply.createdAt).toLocaleString()}
@@ -1075,12 +1081,12 @@ const BlogPage = () => {
                 <li key={comment.id} className="mb-4">
                   <div className="flex items-center space-x-3">
                     <img
-                      src={`../../uploads/avatars/${comment.user.avatar}`}
-                      alt={`${comment.user.username}'s avatar`}
+                      src={`../../uploads/avatars/${comment.user?.avatar || 'man.png'}`}
+                      alt={`${comment.user?.username || "Anonymous"}'s avatar`}
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <p className="text-gray-700 dark:text-gray-200 text-sm font-medium">
-                      {comment.user.username}
+                      {comment.user?.username || 'Anonymous'}
                     </p>
                     <p className="text-gray-500 dark:text-gray-400 text-xs">
                       {new Date(comment.createdAt).toLocaleString()}
