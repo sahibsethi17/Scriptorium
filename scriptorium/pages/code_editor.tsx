@@ -1,3 +1,5 @@
+// MODIFIED FROM CHATGPT
+
 import React, { useEffect, useState } from 'react';
 import CodeEditor from './components/CodeEditor';
 import LanguageSelector from './components/LanguageSelector';

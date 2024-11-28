@@ -332,6 +332,7 @@ const BlogPage = () => {
           id: Number(id), // Ensure that id is part of the body
         }),
       });
+      alert('Blog successfully deleted');
       window.location.href = `/blogs`; // Redirect to the updated blog page
     } catch (error) {
       console.error("Error deleting blog:", error);

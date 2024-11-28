@@ -153,7 +153,7 @@ const TemplateList: React.FC<TemplateListProps> = ({
               {template.tags ? template.tags.split(",").join(", ") : "None"}
             </div>
             <button
-              onClick={() => window.location.href = `http://localhost:3000/blogs?templateIds=${template.id}&pageNum=1&isReported=false`}
+              onClick={() => window.open(`http://localhost:3000/blogs?templateIds=${template.id}&pageNum=1&isReported=false`, '_blank')}
               rel="noopener noreferrer"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
             >
