@@ -1,3 +1,5 @@
+// MODIFIED FROM CHATGPT
+
 import React, { useState } from "react";
 
 interface BlogFormProps {

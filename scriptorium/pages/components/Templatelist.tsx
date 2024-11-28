@@ -152,14 +152,13 @@ const TemplateList: React.FC<TemplateListProps> = ({
               Tags:{" "}
               {template.tags ? template.tags.split(",").join(", ") : "None"}
             </div>
-            <a
-              href={`http://localhost:3000/blogs?templateIds=${template.id}&pageNum=1&isReported=false`}
-              target="_blank"
+            <button
+              onClick={() => window.location.href = `http://localhost:3000/blogs?templateIds=${template.id}&pageNum=1&isReported=false`}
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline mt-2 block"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded"
             >
               View Blogs for Template
-            </a>
+            </button>
             {loggedInUserId === template.userId && (
               <span className="block bg-green-400 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded mt-2">
                 Created by You

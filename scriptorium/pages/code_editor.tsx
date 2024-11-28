@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CodeEditor from './components/CodeEditor';
 import LanguageSelector from './components/LanguageSelector';
 import OutputDisplay from './components/OutputDisplay';
@@ -7,6 +7,7 @@ import axios from 'axios';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { useAuth } from './components/AuthContext'; // Import AuthContext
+import router from 'next/router';
 
 const App: React.FC = () => {
   const { isLoggedIn } = useAuth(); // Access authentication state
@@ -25,6 +26,19 @@ const App: React.FC = () => {
 
   const [refreshTrigger, setRefreshTrigger] = useState(0); // State to trigger template refresh
 
+
+  // Check for query params and pre-fill state
+  useEffect(() => {
+    const { code, language } = router.query;
+
+    if (code) {
+      setCode(String(code));
+    }
+    if (language) {
+      setLanguage(String(language));
+    }
+  }, []); // Re-run when router.query changes
+  
   const handleRunCode = async () => {
     setIsLoading(true);
     setOutput('');

@@ -800,7 +800,7 @@ const BlogPage = () => {
             {blogPost.description}
           </p>
 
-          <div className="mt-4">
+          <div className="mt-4 mb-4">
             <h3 className="text-sm font-semibold text-gray-700 dark:text-white mb-1">
               Tags:
             </h3>
@@ -815,40 +815,45 @@ const BlogPage = () => {
           </div>
 
           {/* Template Information */}
-          {templates.length > 0 && (
-            <div className="mt-8 text-gray-200 dark:bg-gray-700 p-4 rounded-lg shadow-sm border">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                Code Templates Included:
-              </h3>
+          {templates.map((template) => (
+            <div
+              key={template.id}
+              onClick={() => {
+                router.push({
+                  pathname: "/code_editor",
+                  query: {
+                    title: template.title,
+                    description: template.explanation,
+                    tags: template.tags,
+                    code: template.code,
+                    language: template.language,
+                    stdin: template.stdin
+                  },
+                });
+              }}
+              className="mb-6 p-6 bg-white rounded-lg shadow-md border dark:bg-gray-700 dark:text-white cursor-pointer"
+            >
+              <h4 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">
+                {template.title}
+              </h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                {template.explanation}
+              </p>
 
-              {templates.map((template, index) => (
-                <div
-                  key={template.id}
-                  className="mb-6 p-6 bg-white rounded-lg shadow-md border dark:bg-gray-700 dark:text-white"
-                >
-                  <h4 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">
-                    {template.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                    {template.explanation}
-                  </p>
+              <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
+                <p>
+                  <strong>Language:</strong> {template.language}
+                </p>
+                <p>
+                  <strong>Tags:</strong> {template.tags}
+                </p>
+              </div>
 
-                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">
-                    <p>
-                      <strong>Language:</strong> {template.language}
-                    </p>
-                    <p>
-                      <strong>Tags:</strong> {template.tags}
-                    </p>
-                  </div>
-
-                    <pre className="whitespace-pre-wrap break-words">
-                      {template.code}
-                    </pre>
-                </div>
-              ))}
+              <pre className="whitespace-pre-wrap break-words">
+                {template.code}
+              </pre>
             </div>
-          )}
+          ))}
 
           <div className="mt-6 flex justify-between items-center">
             <div className="flex items-center gap-4">
