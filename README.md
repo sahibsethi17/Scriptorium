@@ -5,6 +5,8 @@
 [![GitHub](https://img.shields.io/badge/GitHub-Scriptorium-blue?logo=github)](https://github.com/your-username/Scriptorium)
 
 ![scriptorium](https://github.com/user-attachments/assets/example-image-id)
+<img width="1470" height="764" alt="Screenshot 2025-09-29 at 3 58 00 PM" src="https://github.com/user-attachments/assets/4e6cfe2f-8e32-420b-bd2c-90457e7f6e11" />
+<img width="1470" height="771" alt="Screenshot 2025-09-29 at 3 57 19 PM" src="https://github.com/user-attachments/assets/44d81e1f-3615-4466-aed4-29fafc42f393" />
 
 
 <!-- Tech Stack Badges -->
